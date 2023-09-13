@@ -8,10 +8,12 @@ export default {
   theme: {
     colors: {
       transparent: 'transparent',
-      'primary-blue': '#176B87',
-      'secondary-blue': '#64CCC5',
-      'ternary-blue': '#DAFFFB',
-      'quternary-blue': '#001C30',
+      'blue':'#2155CD',
+      'blue1':'#0AA1DD',
+      'primary-blue': '#42C2FF',
+      'secondary-blue': '#42C2FF',
+      'ternary-blue': '#E8F9FD',
+      'quternary-blue': '#FDFDFD',
       'white': '#ffffff',
       'silver': '#ecebff',
       'black': '#000000',
@@ -22,12 +24,15 @@ export default {
       'blue':'#140EDA',
       'yellow':'#EDE610',
       'green':'#3ED10A',
+      'gray1':'#D9D9D9',
+      'gray2':'#B3B5B6',
       'dark-primary':'#313131',
       'dark-secondary':'#414141',
       'dark-ternary':'#525252',
     },
     fontFamily: {
       inter: ["Inter", "sans-serif"],
+      jomhuria: ["Jomhuria", "cursive"]
     },
   },
   plugins: [],
