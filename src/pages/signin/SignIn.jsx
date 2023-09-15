@@ -1,5 +1,33 @@
-import React from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from "react";
+import { auth } from "../../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useNavigate } from "react-router-dom";
+import googleLogo from "../../assets/images/google.png";
+
 function SignIn() {
+  const [user] = useAuthState(auth);
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [_user, setUser] = useState("");
+
+  const signIn = (e) => {
+    e.preventDefault();
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        console.log(userCredential);
+        setUser(user);
+        console.log(user);
+        localStorage.setItem("gmail", true);
+        if (user) navigate("/admin/dashboard");
+      })
+      .catch((e) => {
+        setError(true);
+      });
+  };
+
   return (
     //main container
     <div
@@ -16,15 +44,15 @@ function SignIn() {
           {/**upper container */}
           <div className="w-full h-1/6">
             <div className="w-full h-1/3 p-5 flex items-center justify-center">
-              <h1 className="font-jomhuria text-5xl text-blue">
+              <h1 className="font-jomhuria text-lg md:text-3xl lg:text-5xl text-blue">
                 Sharp<span className="text-blue1">Tester</span>
               </h1>
             </div>
             <div className="w-full h-2/3 p-3 flex flex-col items-center justify-center">
-              <h1 className="text-3xl font-semibold font-inter">
+              <h1 className="text-lg md:text-2xl lg:text-3xl font-semibold font-inter">
                 Log in to your account
               </h1>
-              <p className="font-inter text-sm">
+              <p className="font-inter text-sm text-[10px] md:text-[12px] lg:text-[16px]">
                 Welcome back! please Enter your login details
               </p>
             </div>
@@ -32,58 +60,69 @@ function SignIn() {
           {/**lower container */}
           <div className="w-full h-5/6 flex justify-center items-center">
             {/**form container */}
-            <form className="h-5/6 w-5/6 flex flex-col justify-center items-center">
+            <form
+              onSubmit={signIn}
+              className="h-5/6 w-5/6 flex flex-col justify-center items-center"
+            >
               {/**form upper container*/}
               <div className="flex flex-col justify-center items-center w-full h-1/2">
                 <div className="w-5/6 h-1/2  flex flex-col items-start justify-center">
                   <p className="font-inter font-semibold">Email</p>
                   <input
-                    className="w-full h-3/6 rounded-full border-2 border-secondary-blue bg-ternary-blue"
-                    type="text"
-                    name=""
-                    id=""
+                    className="w-full h-3/6 rounded-full border-2 p-5 text-lg text-[11px] md:text-[13px] lg:text-[16px] text-primary-blue font-semibold border-secondary-blue bg-ternary-blue"
+                    type="email"
+                    value={email}
+                    placeholder="Enter your Email"
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="w-5/6 h-1/2  flex flex-col items-start justify-center">
                   <p className="font-inter font-semibold">Password</p>
                   <input
-                    className="w-full h-3/6 rounded-full border-2 border-secondary-blue bg-ternary-blue"
-                    type="text"
-                    name=""
-                    id=""
+                    className="w-full h-3/6 rounded-full border-2 p-5 text-lg text-[11px] md:text-[13px] lg:text-[16px] text-primary-blue font-semibold border-secondary-blue bg-ternary-blue"
+                    type="password"
+                    placeholder="Enter your Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
               </div>
               {/**form lower container*/}
               <div className="w-5/6 h-1/2">
+                <div className="w-full h-1/6 text-red font-inter text-center font-bold p-3">
+                  {/**login errors displaying  here */}
+                  {error && <span>Invalid Email or Password!</span>}
+                </div>
                 <div className="flex w-full h-1/4">
-                  <div className="w-1/3 h-full flex items-center justify-center">
+                  <div className="w-1/2 h-full flex items-center justify-center">
                     <input
-                      className="w-5 h-5 hover:border-1"
-                      type="checkbox"
-                      name=""
-                      id=""
+                      className="md:w-3 md:h-3 lg:w-4 lg:h-4 hover:border-1"
+                      type="checkbox"                      
                     />
-                    <span>&nbsp;&nbsp;Remember me</span>
+                    <span className="text-[9px] md:text-[12px] lg:text-[15px]">&nbsp;&nbsp;Remember me</span>
                   </div>
-                  <div className="w-1/3 h-full"></div>
-                  <div className="w-1/3 h-full flex items-center justify-center">
-                    <p className="font-bold text-primary-blue hover:text-blue1 active:text-black">
+                  
+                  <div className="w-1/2 h-full flex items-center justify-center">
+                    <p className="text-[9px] md:text-[12px] lg:text-[15px] font-bold text-primary-blue hover:text-blue1 active:text-black">
                       Forgot Password
                     </p>
                   </div>
                 </div>
                 <div className="w-full h-1/4 flex items-center justify-center">
-                  <button className="bg-primary-blue text-ternary-blue w-3/6 h-5/6 rounded-lg shadow-sm font-inter hover:bg-blue1 hover:shadow-xl">
+                  <button
+                    type="submit"
+                    className="bg-primary-blue text-ternary-blue w-3/6 h-5/6 text-[10px] md:text-[10px] lg:text-[16px] rounded-lg shadow-sm font-inter hover:bg-blue1 hover:shadow-xl"
+                  >
                     Sign In
                   </button>
                 </div>
                 <div className="w-full h-1/4 flex items-center justify-center">
-                  <button className="bg-gray1 text-black w-3/6 h-5/6 rounded-lg shadow-sm font-inter hover:bg-gray2 hover:shadow-xl">
-                    Sign In with Google
+                  <button className="bg-gray1 p-1 md:p-2 lg:p-3 text-black w-3/6 h-5/6 rounded-lg shadow-sm font-inter flex items-center justify-center hover:bg-gray2 hover:shadow-xl">
+                    <img className="h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5" src={googleLogo} alt="google" />
+                    <p className="text-[10px] md:text-[10px] lg:text-[13px]">&nbsp;Sign In with Google</p>
                   </button>
                 </div>
-                <div className="w-full h-1/4 bg-blue1"></div>
               </div>
             </form>
           </div>
