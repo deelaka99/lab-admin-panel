@@ -12,7 +12,6 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [_user, setUser] = useState("");
-  const [value, setValue] = useState('')
 
   const signIn = (e) => {
     e.preventDefault();
@@ -28,17 +27,6 @@ function SignIn() {
         setError(true);
       });
   };
-
-  const signInUsingGoogle = () => {
-    signInWithPopup(auth, googleProvider).then((data) => {
-      setValue(data.user.email);
-      localStorage.setItem("email",data.user.email);
-    });
-  };
-
-  useEffect(()=>{
-    setValue(localStorage.getItem('email'));
-  })
 
   return (
     //main container
@@ -133,7 +121,6 @@ function SignIn() {
                 </div>
                 <div className="w-full h-1/4 flex items-center justify-center">
                   <button
-                    onClick={signInUsingGoogle}
                     className="bg-gray1 p-1 md:p-2 lg:p-3 text-black w-3/6 h-5/6 rounded-lg shadow-sm font-inter flex items-center justify-center hover:bg-gray2 hover:shadow-xl"
                   >
                     <img
