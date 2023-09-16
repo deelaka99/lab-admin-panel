@@ -1,6 +1,6 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
-import React, { useState } from "react";
-import { auth } from "../../firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import React, { useEffect, useState } from "react";
+import { auth, googleProvider } from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import googleLogo from "../../assets/images/google.png";
@@ -12,6 +12,7 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [_user, setUser] = useState("");
+  const [value, setValue] = useState('')
 
   const signIn = (e) => {
     e.preventDefault();
@@ -27,6 +28,17 @@ function SignIn() {
         setError(true);
       });
   };
+
+  const signInUsingGoogle = () => {
+    signInWithPopup(auth, googleProvider).then((data) => {
+      setValue(data.user.email);
+      localStorage.setItem("email",data.user.email);
+    });
+  };
+
+  useEffect(()=>{
+    setValue(localStorage.getItem('email'));
+  })
 
   return (
     //main container
@@ -98,11 +110,13 @@ function SignIn() {
                   <div className="w-1/2 h-full flex items-center justify-center">
                     <input
                       className="md:w-3 md:h-3 lg:w-4 lg:h-4 hover:border-1"
-                      type="checkbox"                      
+                      type="checkbox"
                     />
-                    <span className="text-[9px] md:text-[12px] lg:text-[15px]">&nbsp;&nbsp;Remember me</span>
+                    <span className="text-[9px] md:text-[12px] lg:text-[15px]">
+                      &nbsp;&nbsp;Remember me
+                    </span>
                   </div>
-                  
+
                   <div className="w-1/2 h-full flex items-center justify-center">
                     <p className="text-[9px] md:text-[12px] lg:text-[15px] font-bold text-primary-blue hover:text-blue1 active:text-black">
                       Forgot Password
@@ -118,9 +132,18 @@ function SignIn() {
                   </button>
                 </div>
                 <div className="w-full h-1/4 flex items-center justify-center">
-                  <button className="bg-gray1 p-1 md:p-2 lg:p-3 text-black w-3/6 h-5/6 rounded-lg shadow-sm font-inter flex items-center justify-center hover:bg-gray2 hover:shadow-xl">
-                    <img className="h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5" src={googleLogo} alt="google" />
-                    <p className="text-[10px] md:text-[10px] lg:text-[13px]">&nbsp;Sign In with Google</p>
+                  <button
+                    onClick={signInUsingGoogle}
+                    className="bg-gray1 p-1 md:p-2 lg:p-3 text-black w-3/6 h-5/6 rounded-lg shadow-sm font-inter flex items-center justify-center hover:bg-gray2 hover:shadow-xl"
+                  >
+                    <img
+                      className="h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5"
+                      src={googleLogo}
+                      alt="google"
+                    />
+                    <p className="text-[10px] md:text-[10px] lg:text-[13px]">
+                      &nbsp;Sign In with Google
+                    </p>
                   </button>
                 </div>
               </div>
