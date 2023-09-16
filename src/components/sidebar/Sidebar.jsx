@@ -46,7 +46,7 @@ const Sidebar = () => {
               activeLink === "dashboard"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
                 : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
-            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-2xl font-inter pl-5 p-3`}
+            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("dashboard")}
           >
             <div>
@@ -60,7 +60,7 @@ const Sidebar = () => {
               activeLink === "user-management"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
                 : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
-            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-2xl font-inter pl-5 p-3`}
+            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("user-management")}
           >
             <div>
@@ -74,7 +74,7 @@ const Sidebar = () => {
               activeLink === "report-management"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
                 : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
-            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-2xl font-inter pl-5 p-3`}
+            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("report-management")}
           >
             <div>
@@ -88,7 +88,7 @@ const Sidebar = () => {
               activeLink === "company-payments"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
                 : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
-            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[23px] font-inter pl-5 p-3`}
+            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("company-payments")}
           >
             <div>
@@ -102,7 +102,7 @@ const Sidebar = () => {
               activeLink === "about-us"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
                 : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
-            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-2xl font-inter pl-5 p-3`}
+            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("about-us")}
           >
             <div>
@@ -116,7 +116,7 @@ const Sidebar = () => {
               activeLink === "settings"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
                 : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
-            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-2xl font-inter pl-5 p-3`}
+            } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("settings")}
           >
             <div>
@@ -129,7 +129,7 @@ const Sidebar = () => {
       {/*third raw*/}
       <div className="flex items-center justify-center p-3 h-1/6 w-full">
         <button
-          className="flex items-center justify-center p-3 w-3/4 rounded-lg text-2xl font-inter bg-primary-blue border-2 text-white shadow-xl hover:bg-blue1 dark:bg-dark-primary dark:hover:bg-dark-secondary"
+          className="flex items-center justify-center p-3 w-3/4 rounded-lg text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter bg-primary-blue border-2 text-white shadow-xl hover:bg-blue1 dark:bg-dark-primary dark:hover:bg-dark-secondary"
           onClick={logoutHandler}
         >
           <FontAwesomeIcon icon={faRightFromBracket} /> &nbsp;Logout
