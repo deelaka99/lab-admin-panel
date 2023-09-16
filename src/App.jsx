@@ -40,7 +40,7 @@ function App() {
           <div className="flex flex-col w-full h-full bg-ternary-blue dark:bg-dark-secondary">
             {/* nav */}
             {isLoggedIn && (
-              <div className="flex bg-red-800 w-full h-1/6 bg-primary-blue opacity-60 dark:bg-black dark:opacity-100">
+              <div className="flex bg-red-800 w-full h-[65px] bg-primary-blue opacity-60 dark:bg-black dark:opacity-100">
                 <Navbar />
               </div>
             )}
