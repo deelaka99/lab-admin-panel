@@ -6,6 +6,11 @@ import Sidebar from "./components/sidebar/Sidebar";
 import Navbar from "./components/navbar/Navbar";
 import SignIn from "./pages/signin/SignIn";
 import Dashboard from "./pages/dashboard/Dashboard";
+import UserManagement from "./pages/user-management/UserManagement";
+import ReportManagement from "./pages/report-management/ReportManagement";
+import CompanyPayments from "./pages/company-payments/CompanyPayments";
+import AboutUs from "./pages/about-us/AboutUs";
+import Settings from "./pages/settings/Settings";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase";
@@ -60,11 +65,38 @@ function App() {
                     )
                   }
                 />
+
                 <Route path="/admin">
                   <Route
                     index
                     path="dashboard"
                     element={isLoggedIn ? <Dashboard /> : <Navigate to={"/"} />}
+                  />
+                  <Route
+                    path="user-management"
+                    element={
+                      isLoggedIn ? <UserManagement /> : <Navigate to={"/"} />
+                    }
+                  />
+                  <Route
+                    path="report-management"
+                    element={
+                      isLoggedIn ? <ReportManagement /> : <Navigate to={"/"} />
+                    }
+                  />
+                  <Route
+                    path="company-payments"
+                    element={
+                      isLoggedIn ? <CompanyPayments /> : <Navigate to={"/"} />
+                    }
+                  />
+                  <Route
+                    path="about-us"
+                    element={isLoggedIn ? <AboutUs /> : <Navigate to={"/"} />}
+                  />
+                  <Route
+                    path="settings"
+                    element={isLoggedIn ? <Settings /> : <Navigate to={"/"} />}
                   />
                 </Route>
               </Routes>
