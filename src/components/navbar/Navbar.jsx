@@ -11,7 +11,7 @@ const Navbar = () => {
 
   return (
     <>
-      {/**Search bar */}
+      {/**Search bar  */}
       <div className="h-full w-2/5 flex justify-center items-center ">
         <div className="bg-ternary-blue h-2/3 w-2/3 rounded-3xl flex border-2 border-white hover:shadow-lg dark:border-gray2 dark:bg-dark-ternary">
           <div className="h-full w-10/12 rounded-3xl text-dark-ternary flex p-5 items-center dark:text-gray2">
