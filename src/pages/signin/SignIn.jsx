@@ -5,21 +5,20 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import googleLogo from "../../assets/images/google.png";
 
-function SignIn() {
+function SignIn(props) {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [_user, setUser] = useState("");
+  const { userTypeError } = props;
 
   const signIn = (e) => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential);
+      .then(() => {
         setUser(user);
-        console.log(user);
         localStorage.setItem("gmail", true);
         if (user) navigate("/admin/dashboard");
       })
@@ -31,7 +30,7 @@ function SignIn() {
   return (
     //main container
     <div
-      className="w-screen h-screen flex bg-cover bg-center"
+      className="w-screen h-screen flex bg-cover bg-center text-black"
       style={{
         backgroundImage:
           "url('https://images.pexels.com/photos/4031321/pexels-photo-4031321.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')",
@@ -92,7 +91,10 @@ function SignIn() {
               <div className="w-5/6 h-1/2">
                 <div className="w-full h-1/6 text-red font-inter text-center font-bold p-3">
                   {/**login errors displaying  here */}
-                  {error && <span>Invalid Email or Password!</span>}
+                  {error && <span>Invalid Email or Password!</span> &&
+                  userTypeError === 1 ? (
+                    <span>User type doesn't match!</span>
+                  ) : null}
                 </div>
                 <div className="flex w-full h-1/4">
                   <div className="w-1/2 h-full flex items-center justify-center">
@@ -120,9 +122,7 @@ function SignIn() {
                   </button>
                 </div>
                 <div className="w-full h-1/4 flex items-center justify-center">
-                  <button
-                    className="bg-gray1 p-1 md:p-2 lg:p-3 text-black w-3/6 h-5/6 rounded-lg shadow-sm font-inter flex items-center justify-center hover:bg-gray2 hover:shadow-xl"
-                  >
+                  <button className="bg-gray1 p-1 md:p-2 lg:p-3 text-black w-3/6 h-5/6 rounded-lg shadow-sm font-inter flex items-center justify-center hover:bg-gray2 hover:shadow-xl">
                     <img
                       className="h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5"
                       src={googleLogo}

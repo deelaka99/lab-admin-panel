@@ -11,7 +11,7 @@ export default {
       'blue':'#2155CD',
       'blue1':'#0AA1DD',
       'primary-blue': '#42C2FF',
-      'secondary-blue': '#42C2FF',
+      'secondary-blue': '#85F4FF',
       'ternary-blue': '#E8F9FD',
       'quternary-blue': '#FDFDFD',
       'white': '#ffffff',
