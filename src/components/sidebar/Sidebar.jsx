@@ -5,7 +5,6 @@ import {
   faFileLines,
   faHome,
   faUsers,
-  faUser,
   faGear,
   faMoneyCheckDollar,
   faAddressCard
@@ -45,7 +44,7 @@ const Sidebar = () => {
             className={`${
               activeLink === "dashboard"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
-                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
+                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-white dark:text-ternary-blue dark:hover:bg-dark-secondary"
             } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("dashboard")}
           >
@@ -59,7 +58,7 @@ const Sidebar = () => {
             className={`${
               activeLink === "user-management"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
-                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
+                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-white dark:text-ternary-blue dark:hover:bg-dark-secondary"
             } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("user-management")}
           >
@@ -73,7 +72,7 @@ const Sidebar = () => {
             className={`${
               activeLink === "report-management"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
-                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
+                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-white dark:text-ternary-blue dark:hover:bg-dark-secondary"
             } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("report-management")}
           >
@@ -87,7 +86,7 @@ const Sidebar = () => {
             className={`${
               activeLink === "company-payments"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
-                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
+                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-white dark:text-ternary-blue dark:hover:bg-dark-secondary"
             } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("company-payments")}
           >
@@ -101,7 +100,7 @@ const Sidebar = () => {
             className={`${
               activeLink === "about-us"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
-                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
+                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-white dark:text-ternary-blue dark:hover:bg-dark-secondary"
             } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("about-us")}
           >
@@ -115,7 +114,7 @@ const Sidebar = () => {
             className={`${
               activeLink === "settings"
                 ? "text-primary-blue bg-ternary-blue rounded-full dark:bg-dark-secondary"
-                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-ternary-blue dark:hover:bg-dark-secondary"
+                : "hover:bg-ternary-blue hover:opacity-80 hover:text-primary-blue hover:rounded-full text-white dark:text-ternary-blue dark:hover:bg-dark-secondary"
             } hover:bg-ternary-blue dark:hover:bg-dark-secondary text-[10px] sm:text-[12px] md:text-[15px] lg:text-[18px] font-inter pl-5 p-3`}
             onClick={() => setActiveLink("settings")}
           >

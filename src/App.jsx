@@ -53,7 +53,7 @@ function App() {
         <div className="flex h-screen w-screen overflow-hidden">
           {/* side bar */}
           {isLoggedIn && (
-            <div className="h-full w-1/4 bg-primary-blue dark:bg-black dark:opacity-90">
+            <div className="h-full w-1/4 bg-primary-blue bg-opacity-80 dark:bg-black dark:opacity-90">
               <Sidebar />
             </div>
           )}
@@ -61,7 +61,7 @@ function App() {
           <div className="flex flex-col w-full h-full bg-ternary-blue dark:bg-dark-secondary">
             {/* nav */}
             {isLoggedIn && (
-              <div className="flex w-full h-[65px] bg-secondary-blue dark:bg-black dark:opacity-100">
+              <div className="flex w-full h-[65px] bg-primary-blue dark:bg-black dark:opacity-100">
                 <Navbar />
               </div>
             )}
