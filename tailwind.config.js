@@ -24,6 +24,7 @@ export default {
       'blue':'#140EDA',
       'blue2':'#0AA1DD',
       'yellow':'#EDE610',
+      'orange':'#F7A367',
       'green':'#3ED10A',
       'gray1':'#D9D9D9',
       'gray2':'#B3B5B6',

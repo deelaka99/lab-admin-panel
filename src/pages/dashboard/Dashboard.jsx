@@ -1,4 +1,5 @@
 import React from "react";
+import Card from "../../components/dashboardCard/Card";
 
 function Dashboard() {
   return (
@@ -8,7 +9,15 @@ function Dashboard() {
           <div className="flex justify-center items-center w-full h-1/6 p-2 border-b-2 border-white dark:border-dark-ternary">
             <h1 className="font-inter text-primary-blue">Report details</h1>
           </div>
-          <div className="w-full h-5/6"></div>
+          <div className="flex justify-center items-center w-full h-5/6 p-5">
+            <Card color={"orange"} title={"Report Types"} count={"18"} />
+            <p>&nbsp;&nbsp;&nbsp;</p>
+            <Card color={"green"} title={"Pending Reports"} count={"22"} />
+            <p>&nbsp;&nbsp;&nbsp;</p>
+            <Card color={"red"} title={"Total Report Sent"} count={"100"} />
+            <p>&nbsp;&nbsp;&nbsp;</p>
+            <Card color={"blue"} title={"User Feedbacks"} count={"1800"} />
+          </div>
         </div>
       </div>
       <div className="flex p-2 w-full h-1/2">
