@@ -22,6 +22,7 @@ export default {
       'red-1':'#CB4006',
       'red-2':'#FB5249',
       'blue':'#140EDA',
+      'blue2':'#0AA1DD',
       'yellow':'#EDE610',
       'green':'#3ED10A',
       'gray1':'#D9D9D9',

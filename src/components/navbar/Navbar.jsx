@@ -56,11 +56,11 @@ const Navbar = () => {
     <>
       {/**Search bar */}
       <div className="h-full w-2/5 flex justify-center items-center ">
-        <div className="bg-ternary-blue h-2/3 w-2/3 rounded-3xl flex border-2 border-white hover:shadow-lg dark:border-gray2 dark:bg-dark-ternary">
-          <div className="h-full w-10/12 text-[9px] sm:text-[10px] md:text-[12px] lg:text-[14px] text-dark-ternary flex p-5 items-center dark:text-gray2">
+        <div className="bg-ternary-blue h-2/3 w-2/3 rounded-3xl flex shadow-lg dark:border-gray2 dark:bg-dark-ternary">
+          <div className="h-full w-10/12 text-[9px] sm:text-[10px] md:text-[12px] lg:text-[14px] text-primary-blue flex p-5 items-center dark:text-gray2">
             Search...
           </div>
-          <div className="h-full w-2/12 flex justify-center items-center text-[9px] sm:text-[10px] md:text-[12px] lg:text-[14px] drop-shadow-xl text-dark-ternary hover:text-dark-primary dark:text-gray2 dark:hover:text-gray1">
+          <div className="h-full w-2/12 flex justify-center items-center text-[9px] sm:text-[10px] md:text-[12px] lg:text-[14px] drop-shadow-xl text-primary-blue hover:text-secondary-blue dark:text-gray2 dark:hover:text-gray1">
             <FontAwesomeIcon icon={faMagnifyingGlass} />
           </div>
         </div>
@@ -80,12 +80,12 @@ const Navbar = () => {
         {/**user button */}
         <div className="h-full w-4/5 flex justify-center items-center">
           <div className="flex items-center justify-center h-full w-3/4 ">
-            <h6 className="flex items-center justify-end text-dark-ternary text-[9px] sm:text-[10px] md:text-[12px] lg:text-[14px] font-inter w-4/6  dark:text-white">
+            <h6 className="flex items-center justify-end text-ternary-blue text-[9px] sm:text-[10px] md:text-[12px] lg:text-[14px] font-inter w-4/6  dark:text-white">
               {timeOfDay}&nbsp;{user !== null ? labData.LabName : "no-user"}
             </h6>
           </div>
-          <div className="flex justify-center items-center md:border-l-2 lg:border-l-4 border-dark-ternary dark:border-ternary-blue Sh-full w-1/4 ">
-            <div className="bg-white shadow-xl border-2  border-dark-ternary h-[30px] w-[30px]  sm:h-[37px] sm:w-[37px] md:h-[41px] md:w-[41px] lg:h-[45px] lg:w-[45px] rounded-full dark:border-silver">
+          <div className="flex justify-center items-center md:border-l-2 lg:border-l-4 border-ternary-blue dark:border-ternary-blue Sh-full w-1/4 ">
+            <div className="bg-white shadow-xl border-2  border-ternary-blue h-[30px] w-[30px]  sm:h-[37px] sm:w-[37px] md:h-[41px] md:w-[41px] lg:h-[45px] lg:w-[45px] rounded-full dark:border-silver">
               <img
                 className="h-[28px] w-[28px] sm:h-[35px] sm:w-[35px] md:h-[39px] md:w-[39px] lg:h-[43px] lg:w-[43px] rounded-full"
                 src={logo}

@@ -61,7 +61,7 @@ function App() {
           <div className="flex flex-col w-full h-full bg-ternary-blue dark:bg-dark-secondary">
             {/* nav */}
             {isLoggedIn && (
-              <div className="flex w-full h-[65px] bg-secondary-blue dark:bg-black dark:opacity-100">
+              <div className="flex w-full h-[65px] bg-primary-blue bg-opacity-70 dark:bg-black dark:opacity-100">
                 <Navbar />
               </div>
             )}
