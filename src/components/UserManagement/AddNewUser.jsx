@@ -11,40 +11,36 @@ function AddNewUser() {
   const [showAddedSuccessModal, setShowAddedSuccessModal] = useState(false);
   const [showAddedUnsuccessModal, setShowAddedUnsuccessModal] = useState(false);
   //variable state
+  const [operatorName, setOperatorName] = useState("");
   const [userName, setUserName] = useState("");
-  const [LabName, setLabName] = useState("");
   const [district, setDistrict] = useState("Colombo");
   const [telephone, setTelephone] = useState("");
-  const [paymentDate, setPaymentDate] = useState("");
   const [password, setPassword] = useState("");
   const [address, setAddress] = useState("");
   const [province, setProvince] = useState("Western");
   const [email, setEmail] = useState("");
-  const [amount, setAmount] = useState("1500");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFilePath, setSelectedFilePath] = useState(null);
 
   //error states
+  const [operatorNameError, setOperatorNameError] = useState("");
   const [userNameError, setUserNameError] = useState("");
-  const [labNameError, setLabNameError] = useState("");
   const [districtError, setDistrictError] = useState("");
   const [telephoneError, setTelephoneError] = useState("");
-  const [paymentDateError, setPaymentDateError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [addressError, setAddressError] = useState("");
   const [provinceError, setProvinceError] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [amountError, setAmountError] = useState("");
 
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
-      const adminRef = ref(db, `admins/${user.uid}`);
-      const unsubscribe = onValue(adminRef, (snapshot) => {
+      const labOpRef = ref(db, `labs/${user.uid}`);
+      const unsubscribe = onValue(labOpRef, (snapshot) => {
         if (snapshot.exists()) {
-          const adminData = snapshot.val();
-          const adminUsername = adminData.name; // Assuming "name" is the field containing the admin username
-          setUserName(adminUsername);
+          const labOpData = snapshot.val();
+          const labOpName = labOpData.LabName; // Assuming "name" is the field containing the admin username
+          setOperatorName(labOpName);
         }
       });
 
@@ -72,16 +68,13 @@ function AddNewUser() {
     //email validation things
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-    //amount validation things
-    const amountPattern = /^\d+(\.\d{1,2})?$/;
-
-    if (!userName) {
-      setUserNameError("User name is required");
+    if (!operatorName) {
+      setOperatorNameError("Operator name is required");
       isValid = false;
     }
 
-    if (!LabName) {
-      setLabNameError("Lab name is required");
+    if (!userName) {
+      setUserNameError("User name is required");
       isValid = false;
     }
 
@@ -97,11 +90,6 @@ function AddNewUser() {
       setTelephoneError(
         "Invalid telephone number. Please enter a 10-digit number."
       );
-      isValid = false;
-    }
-
-    if (!paymentDate) {
-      setPaymentDateError("Payment date is required");
       isValid = false;
     }
 
@@ -141,14 +129,6 @@ function AddNewUser() {
       isValid = false;
     }
 
-    if (!amount) {
-      setAmountError("Amount is required");
-      isValid = false;
-    } else if (!amountPattern.test(amount)) {
-      setAmountError("Invalid amount format. Please enter a valid amount.");
-      isValid = false;
-    }
-
     if (!isValid) {
       setShowAddedUnsuccessModal(true);
       return; //not proceed if there are validation errors
@@ -160,44 +140,43 @@ function AddNewUser() {
             return;
           }
 
-          //writting data to the firebase
-          const uuid = uid();
-          set(ref(db, `labs/${uuid}`), {
-            uuid,
-            userName,
-            LabName,
-            district,
-            telephone,
-            paymentDate,
-            password: hashedPassword, //store the hashed password
-            address,
-            province,
-            email,
-            amount,
-            type: "lab",
-            blocked: false,
-          });
-
-          setUserName("");
-          setLabName("");
-          setDistrict("");
-          setTelephone("");
-          setPaymentDate("");
-          setPassword("");
-          setAddress("");
-          setProvince("");
-          setEmail("");
-          setAmount("");
-
-          setShowAddedSuccessModal(true);
-
           // create a lab admin
           createUserWithEmailAndPassword(auth, email, password)
             .then(() => {
-              logout();
+              //writting data to the firebase
+              const uid = auth.currentUser.uid;
+              set(ref(db, `users/${uid}`), {
+                uid,
+                operatorName,
+                userName,
+                district,
+                telephone,
+                password: hashedPassword, //store the hashed password
+                address,
+                province,
+                email,
+                type: "user",
+                blocked: false,
+              });
+
+              setOperatorName("");
+              setUserName("");
+              setDistrict("");
+              setTelephone("");
+              setPassword("");
+              setAddress("");
+              setProvince("");
+              setEmail("");
+
+              setShowAddedSuccessModal(true);
+
+              // Delay the logout function call for 3 seconds
+              setTimeout(() => {
+                logout();
+              }, 3000); // 3000 milliseconds = 3 seconds
             })
             .catch((error) => {
-              console.error("Error creating lab admin:", error);
+              console.error("Error creating the user:", error);
             });
         });
       });
@@ -215,7 +194,6 @@ function AddNewUser() {
       setSelectedFile(null);
       setSelectedFilePath(null);
     }
-    setSelectedProfilePicture(file);
   };
 
   return (
@@ -234,14 +212,14 @@ function AddNewUser() {
                     type="text"
                     placeholder="Enter operator's name"
                     className={`${
-                      userNameError === ""
+                      operatorNameError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
                     } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
-                    value={userName}
+                    value={operatorName}
                     onChange={(e) => {
-                      setUserName(e.target.value);
-                      setUserNameError(""); // Clear error when the user types
+                      setOperatorName(e.target.value);
+                      setOperatorNameError("");
                     }}
                   />
                 </div>
@@ -255,14 +233,14 @@ function AddNewUser() {
                     type="text"
                     placeholder="Enter username"
                     className={`${
-                      labNameError === ""
+                      userNameError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
                     } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
-                    value={LabName}
+                    value={userName}
                     onChange={(e) => {
-                      setLabName(e.target.value);
-                      setLabNameError("");
+                      setUserName(e.target.value);
+                      setUserNameError("");
                     }}
                   />
                 </div>
@@ -387,7 +365,7 @@ function AddNewUser() {
                       emailError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-primary-blue dark:text-gray1 border-secondary-blue border-2 p-3 text-md placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
@@ -468,7 +446,7 @@ function AddNewUser() {
                 {/*body*/}
                 <div className="relative p-6 flex flex-col">
                   <h3 className="text-2xl font-semibold">
-                    Lab Added Successfully ! 😎
+                    User Added Successfully ! 😎
                   </h3>
                 </div>
                 {/*footer*/}
@@ -501,16 +479,16 @@ function AddNewUser() {
                 {/*body*/}
                 <div className="relative p-6 flex flex-col">
                   <h3 className="text-center text-2xl font-semibold">
-                    Lab Added Unsuccessfully ! 😢
+                    User Added Unsuccessfully ! 😢
                   </h3>
                   {userNameError && (
                     <p className="h-1/6 pt-1 text-xs text-center text-white">
                       - {userNameError} -
                     </p>
                   )}
-                  {labNameError && (
+                  {operatorNameError && (
                     <p className="h-1/6 pt-1 text-xs text-center text-white">
-                      - {labNameError} -
+                      - {operatorNameError} -
                     </p>
                   )}
                   {districtError && (
@@ -521,11 +499,6 @@ function AddNewUser() {
                   {telephoneError && (
                     <p className="h-1/6 pt-1 text-xs text-center text-white">
                       - {telephoneError} -
-                    </p>
-                  )}
-                  {paymentDateError && (
-                    <p className="h-1/6 pt-1 text-xs text-center text-white">
-                      - {paymentDateError} -
                     </p>
                   )}
                   {passwordError && (
@@ -546,11 +519,6 @@ function AddNewUser() {
                   {emailError && (
                     <p className="h-1/6 pt-1 text-xs text-center text-white">
                       - {emailError} -
-                    </p>
-                  )}
-                  {amountError && (
-                    <p className="h-1/6 pt-1 text-xs text-center text-white">
-                      - {amountError} -
                     </p>
                   )}
                 </div>
