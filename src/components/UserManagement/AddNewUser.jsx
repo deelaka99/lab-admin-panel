@@ -1,8 +1,8 @@
 import { React, useEffect, useState } from "react";
 import bcrypt from "bcryptjs";
-import { auth, db, logout } from "../../firebase";
-//import { uid } from "uid";
+import { auth, db, logout, storage } from "../../firebase";
 import { set, ref, onValue } from "firebase/database";
+import { ref as ref1, uploadBytes, getDownloadURL } from "firebase/storage";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
@@ -19,8 +19,10 @@ function AddNewUser() {
   const [address, setAddress] = useState("");
   const [province, setProvince] = useState("Western");
   const [email, setEmail] = useState("");
+  const [proPic, setProPic] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFilePath, setSelectedFilePath] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   //error states
   const [operatorNameError, setOperatorNameError] = useState("");
@@ -31,6 +33,9 @@ function AddNewUser() {
   const [addressError, setAddressError] = useState("");
   const [provinceError, setProvinceError] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [proPicError, setProPicError] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [proPicUploadError, setProPicUploadError] = useState("");
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -119,6 +124,17 @@ function AddNewUser() {
       isValid = false;
     }
 
+    if (!selectedFile) {
+      setProPicError("Please select an image");
+      isValid = false;
+    } else if (!selectedFile.type.startsWith("image/")) {
+      setProPicError("Please select a valid image file");
+      isValid = false;
+    } else if (selectedFile.size > 5 * 1024 * 1024) {
+      setProPicError("File size exceeds the maximum limit of 5MB");
+      isValid = false;
+    }
+
     if (!email) {
       setEmailError("Email is required");
       isValid = false;
@@ -126,6 +142,18 @@ function AddNewUser() {
       setEmailError(
         "Invalid email format. Please enter a valid email address."
       );
+      isValid = false;
+    }
+
+    if (authError) {
+      isValid = false;
+    }
+
+    if (proPicError) {
+      isValid = false;
+    }
+
+    if (proPicUploadError) {
       isValid = false;
     }
 
@@ -140,42 +168,59 @@ function AddNewUser() {
             return;
           }
 
-          // create a lab admin
+          // create a user
           createUserWithEmailAndPassword(auth, email, password)
             .then(() => {
               //writting data to the firebase
               const uid = auth.currentUser.uid;
-              set(ref(db, `users/${uid}`), {
-                uid,
-                operatorName,
-                userName,
-                district,
-                telephone,
-                password: hashedPassword, //store the hashed password
-                address,
-                province,
-                email,
-                type: "user",
-                blocked: false,
-              });
 
-              setOperatorName("");
-              setUserName("");
-              setDistrict("");
-              setTelephone("");
-              setPassword("");
-              setAddress("");
-              setProvince("");
-              setEmail("");
+              try {
+                setLoading(true); // Set loading state to true
+                // Upload profile picture to Firebase Storage
+                const storageRef = ref1(storage, "profilePictures/" + uid);
+                uploadBytes(storageRef, selectedFile)
+                  .then(async () => {
+                    // Retrieve the download URL after the upload is complete
+                    const downloadURL = await getDownloadURL(storageRef);
+                    setProPic(downloadURL);
 
-              setShowAddedSuccessModal(true);
+                    set(ref(db, `users/${uid}`), {
+                      uid,
+                      operatorName,
+                      userName,
+                      district,
+                      telephone,
+                      password: hashedPassword, //store the hashed password
+                      address,
+                      province,
+                      email,
+                      proPic: downloadURL,
+                      type: "user",
+                      blocked: false,
+                    });
 
-              // Delay the logout function call for 3 seconds
-              setTimeout(() => {
-                logout();
-              }, 3000); // 3000 milliseconds = 3 seconds
+                    setShowAddedSuccessModal(true);
+                    // Delay the logout function call for 3 seconds
+                    setTimeout(() => {
+                      logout();
+                    }, 3000); // 3000 milliseconds = 3 seconds
+                  })
+                  .catch((error) => {
+                    setProPicUploadError("Error occured when uploading Profile picture, Try again!");
+                    setShowAddedUnsuccessModal(true);
+                    console.log("Error uploading Propic", error);
+                  })
+                  .finally(() => {
+                    setLoading(false);
+                  });
+              } catch (error) {
+                setShowAddedUnsuccessModal(true);
+                console.log("Error adding user", error);
+              }
             })
             .catch((error) => {
+              setAuthError("Authentication Error! Try with another Email");
+              setShowAddedUnsuccessModal(true);
               console.error("Error creating the user:", error);
             });
         });
@@ -521,6 +566,21 @@ function AddNewUser() {
                       - {emailError} -
                     </p>
                   )}
+                  {proPicError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {proPicError} -
+                    </p>
+                  )}
+                  {authError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {authError} -
+                    </p>
+                  )}
+                  {proPicUploadError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {proPicUploadError} -
+                    </p>
+                  )}
                 </div>
                 {/*footer*/}
               </div>
@@ -528,6 +588,15 @@ function AddNewUser() {
           </div>
           <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
         </div>
+      ) : null}
+
+      {loading ? (
+        <>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
+            <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-primary-blue dark:border-white"></div>
+          </div>
+          <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </>
       ) : null}
     </div>
   );
