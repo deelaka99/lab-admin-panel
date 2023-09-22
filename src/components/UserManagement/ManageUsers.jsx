@@ -92,7 +92,7 @@ function ManageUsers() {
       </div>
       <div className="flex items-center justify-center w-full h-1/6 p-3 border-t border-ternary-blue dark:border-dark-ternary">
         {/* pagination */}
-        <div className="flex items-center justify-end mt-2 gap-2 text-ternary-blue">
+        <div className="flex items-center justify-end mt-2 gap-2 text-ternary-blue dark:text-gray2">
           <button
             onClick={() => {
               table.previousPage();

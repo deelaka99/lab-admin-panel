@@ -1,14 +1,33 @@
-import {
-  flexRender,
-} from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
+import {useEffect} from "react";
 
 const TanStackTable = (props) => {
   const { tableName } = props;
 
+//   // Function to update the width of the header cells to match the body cells
+//   const updateHeaderCellWidths = () => {
+//     const headerCells = tableRef.current.querySelectorAll("thead th");
+//     const bodyCells = tableRef.current.querySelectorAll("tbody td");
+// 
+//     headerCells.forEach((headerCell, index) => {
+//       const bodyCell = bodyCells[index];
+//       headerCell.style.width = `${bodyCell.clientWidth}px`;
+//     });
+//   };
+// 
+//   // Call the updateHeaderCellWidths function initially and whenever the table changes
+//   useEffect(() => {
+//     updateHeaderCellWidths();
+//     window.addEventListener("resize", updateHeaderCellWidths);
+//     return () => {
+//       window.removeEventListener("resize", updateHeaderCellWidths);
+//     };
+//   }, []);
+
   return (
     <div className="bg-green h-full w-full rounded">
-      <table className="border border-ternary-blue w-full text-left">
-        <thead className="bg-ternary-blue text-primary-blue">
+      <table className="border border-ternary-blue w-full h-full text-left dark:border-gray2">
+        <thead className="bg-ternary-blue text-primary-blue dark:bg-dark-primary dark:text-gray2">
           {tableName.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
@@ -22,7 +41,7 @@ const TanStackTable = (props) => {
             </tr>
           ))}
         </thead>
-        <tbody className="text-ternary-blue bg-primary-blue">
+        <tbody className="text-ternary-blue bg-primary-blue dark:bg-dark-ternary dark:text-gray1">
           {tableName.getRowModel().rows.length ? (
             tableName.getRowModel().rows.map((row, i) => (
               <tr
@@ -44,7 +63,7 @@ const TanStackTable = (props) => {
             </tr>
           )}
         </tbody>
-      </table>      
+      </table>
     </div>
   );
 };
