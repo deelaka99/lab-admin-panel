@@ -1,11 +1,12 @@
-import { React, useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { update, remove, ref, onValue } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
 import NotificationModal from "../Modal/NotificationModal";
 
-function UserManageTable() {
+function ManageUserTable(props) {
+  const { tableName } = props;
   const [showEditModal, setShowEditModal] = useState(false);
   const [userData, setUserData] = useState([]); // State to store retrieved data
   const [selectedUser, setSelectedUser] = useState({
@@ -36,18 +37,18 @@ function UserManageTable() {
   const [showUserBlockedModal, setShowUserBlockedModal] = useState(false);
   const [showUserUnblockedModal, setShowUserUnblockedModal] = useState(false);
 
-  // useEffect hook to fetch data from Firebase
-  useEffect(() => {
-    const userRef = ref(db, "users");
-    onValue(userRef, (snapshot) => {
-      const userData = [];
-      snapshot.forEach((childSnapshot) => {
-        const user = childSnapshot.val();
-        userData.push(user);
+    // useEffect hook to fetch data from Firebase
+    useEffect(() => {
+      const userRef = ref(db, "users");
+      onValue(userRef, (snapshot) => {
+        const userData = [];
+        snapshot.forEach((childSnapshot) => {
+          const user = childSnapshot.val();
+          userData.push(user);
+        });        
+        setUserData(userData);
       });
-      setUserData(userData);
-    });
-  }, []);
+    }, []);
 
   // user update function
   const updateUserData = () => {
@@ -117,84 +118,80 @@ function UserManageTable() {
 
   return (
     <>
-      <div className="flex items-center justify-center overflow-hidden w-full h-full">
-        <div className="w-11/12 h-5/6 overflow-y-auto overflow-x-auto shadow-md rounded">
-          <table className=" h-full w-full text-sm text-center  text-primary-blue dark:text-white">
-            <thead className="text-xs text-white  uppercase bg-secondary-blue dark:bg-black dark:text-dark-ternary">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  USER NAME
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  ADDRESS
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  TELEPHONE
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  EMAIL
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  PROFILE PICTURE
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  ACTION
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-ternary-blue h-full w-full dark:bg-dark-ternary">
+      <div className="h-full w-full rounded">
+        <table className="border border-ternary-blue w-full h-full text-center dark:border-gray2">
+          <thead className="bg-ternary-blue text-primary-blue dark:bg-dark-primary dark:text-gray2">
+            <tr>
+              <th>U.Id</th>
+              <th>Username</th>
+              <th>Address</th>
+              <th>Telephone</th>
+              <th>Email</th>
+              <th>Profile Pic</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody className="text-ternary-blue bg-primary-blue dark:bg-dark-ternary dark:text-gray1">
             {userData.map((user, index) => (
-                <tr key={index} className="border-b">
-                  <td className="px-6 py-4">{user.userName}</td>
-                  <td className="px-6 py-4">{user.address}</td>
-                  <td className="px-6 py-4">{user.telephone}</td>
-                  <td className="px-6 py-4">{user.email}</td>
-                  <td className="px-6 py-4">
-                    <img
-                      className="w-8 h-8 rounded-full"
-                      src={user.proPic}
-                      alt="proPic"
-                    />
-                  </td>
-                  <td className="px-6 py-4 space-x-2 flex">
-                    <button
-                      className="bg-blue text-white p-1 rounded shadow-lg hover:opacity-80"
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setShowEditModal(true);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className={`${
-                        user.blocked ? "bg-green text-white" : "bg-yellow"
-                      } text-black p-1 rounded shadow-lg hover:opacity-80`}
-                      onClick={() => {
-                        handleToggleBlock(index);
-                        user.blocked
-                          ? setShowUserBlockedModal(true)
-                          : setShowUserUnblockedModal(true);
-                      }}
-                    >
-                      {user.blocked ? "Unblock" : "Block"}
-                    </button>
-                    <button
-                      className="bg-red text-white p-1 rounded shadow-lg hover:opacity-80"
-                      onClick={() => {
-                        removeUser(user.uuid);
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              <tr
+                key={index}
+                className={`
+              ${
+                index % 2 === 0
+                  ? "bg-primary-blue bg-opacity-50 dark:bg-dark-secondary dark:bg-opacity-80 "
+                  : "bg-secondary-blue bg-opacity-30 dark:bg-dark-primary  dark:bg-opacity-80"
+              }
+              `}
+              >
+                <td className="px-6 py-4">{index + 1}</td>
+                <td className="px-6 py-4">{user.userName}</td>
+                <td className="px-6 py-4">{user.address}</td>
+                <td className="px-6 py-4">{user.telephone}</td>
+                <td className="px-6 py-4">{user.email}</td>
+                <td className="px-6 py-4">
+                  <img
+                    className="w-8 h-8 rounded-full"
+                    src={user.proPic}
+                    alt="proPic"
+                  />
+                </td>
+                <td className="px-6 py-4 space-x-2 flex">
+                  <button
+                    className="bg-blue text-white p-1 rounded shadow-lg hover:opacity-80"
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setShowEditModal(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className={`${
+                      user.blocked ? "bg-green text-white" : "bg-yellow"
+                    } text-black p-1 rounded shadow-lg hover:opacity-80`}
+                    onClick={() => {
+                      handleToggleBlock(index);
+                      user.blocked
+                        ? setShowUserBlockedModal(true)
+                        : setShowUserUnblockedModal(true);
+                    }}
+                  >
+                    {user.blocked ? "Unblock" : "Block"}
+                  </button>
+                  <button
+                    className="bg-red text-white p-1 rounded shadow-lg hover:opacity-80"
+                    onClick={() => {
+                      removeUser(user.uuid);
+                    }}
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
       {/**Edit lab modal */}
       {showEditModal ? (
         <div>
@@ -394,4 +391,4 @@ function UserManageTable() {
   );
 }
 
-export default UserManageTable;
+export default ManageUserTable;

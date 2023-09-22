@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { db } from "../../firebase";
+import { update, remove, ref, onValue } from "firebase/database";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -6,9 +8,8 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { USERS } from "../tables/sampleTable/TableData";
 
-import SampleTable from "../tables/sampleTable/SampleTable";
+import UManageTable from "../tables/UManageTable";
 import DownloadBtn from "../tables/sampleTable/DownloadBtn";
 import DebouncedInput from "../tables/sampleTable/DebouncedInput";
 
@@ -16,50 +17,65 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 
 function ManageUsers() {
+  const [userData, setUserData] = useState([]);
+
+  // useEffect hook to fetch data from Firebase
+  useEffect(() => {
+    const userRef = ref(db, "users");
+    onValue(userRef, (snapshot) => {
+      const userData = [];
+      snapshot.forEach((childSnapshot) => {
+        const user = childSnapshot.val();
+        userData.push(user);
+      });        
+      setUserData(userData);
+      console.log("Fetched data from Firebase:", userData);
+    });
+  }, []);
+
   const columnHelper = createColumnHelper();
 
   const columns = [
     columnHelper.accessor("", {
-      id: "S.No",
+      id: "U.No",
       cell: (info) => <span>{info.row.index + 1}</span>,
-      header: "S.No",
+      header: "U.No",
     }),
-    columnHelper.accessor("profile", {
+    columnHelper.accessor("proPic", {
       cell: (info) => (
         <img
           src={info?.getValue()}
-          alt="..."
-          className="rounded-full w-10 h-10 object-cover"
+          alt="proPic"
+          className="rounded-full border w-10 h-10 object-cover"
         />
       ),
-      header: "Profile",
+      header: "Profile Pic",
     }),
-    columnHelper.accessor("firstName", {
+    columnHelper.accessor("userName", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "First Name",
+      header: "Name",
     }),
-    columnHelper.accessor("lastName", {
+    columnHelper.accessor("address", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Last Name",
+      header: "Address",
     }),
-    columnHelper.accessor("age", {
+    columnHelper.accessor("telephone", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Age",
+      header: "Telephone",
     }),
-    columnHelper.accessor("visits", {
+    columnHelper.accessor("email", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Visits",
+      header: "Email",
     }),
-    columnHelper.accessor("progress", {
-      cell: (info) => <span>{info.getValue()}</span>,
-      header: "Progress",
+    columnHelper.accessor("", {
+      header: "Action",
     }),
   ];
-  const [data] = useState(() => [...USERS]);
+  const [data] = useState(() => [...userData]);
   const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
-    data,
+    data:userData,
     columns,
     state: {
       globalFilter,
@@ -68,6 +84,7 @@ function ManageUsers() {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex items-center w-full h-1/6 border-b border-ternary-blue dark:border-dark-ternary">
@@ -88,7 +105,7 @@ function ManageUsers() {
         </div>
       </div>
       <div className="flex items-center justify-center w-full h-4/6 max-h-[450px] overflow-y-auto p-3 rounded">
-        <SampleTable tableName={table} />
+        <UManageTable tableName={table} />
       </div>
       <div className="flex items-center justify-center w-full h-1/6 p-3 border-t border-ternary-blue dark:border-dark-ternary">
         {/* pagination */}

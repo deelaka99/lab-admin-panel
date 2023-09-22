@@ -2,7 +2,7 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 
-const TanStackTable = (props) => {
+const UManageTable = (props) => {
   const { tableName } = props;
 
   return (
@@ -49,4 +49,4 @@ const TanStackTable = (props) => {
   );
 };
 
-export default TanStackTable;
+export default UManageTable;
