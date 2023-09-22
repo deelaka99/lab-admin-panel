@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import React, { useEffect, useState } from "react";
-import { auth, googleProvider } from "../../firebase";
+import React, { useState } from "react";
+import { auth} from "../../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import googleLogo from "../../assets/images/google.png";
@@ -119,18 +119,6 @@ function SignIn(props) {
                     className="bg-primary-blue text-ternary-blue w-3/6 h-5/6 text-[10px] md:text-[10px] lg:text-[16px] rounded-lg shadow-sm font-inter hover:bg-blue1 hover:shadow-xl"
                   >
                     Sign In
-                  </button>
-                </div>
-                <div className="w-full h-1/4 flex items-center justify-center">
-                  <button className="bg-gray1 p-1 md:p-2 lg:p-3 text-black w-3/6 h-5/6 rounded-lg shadow-sm font-inter flex items-center justify-center hover:bg-gray2 hover:shadow-xl">
-                    <img
-                      className="h-3 w-3 md:h-4 md:w-4 lg:h-5 lg:w-5"
-                      src={googleLogo}
-                      alt="google"
-                    />
-                    <p className="text-[10px] md:text-[10px] lg:text-[13px]">
-                      &nbsp;Sign In with Google
-                    </p>
                   </button>
                 </div>
               </div>

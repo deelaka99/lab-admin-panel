@@ -12,6 +12,8 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@tanstack/react-table": "^8.10.1",
+    "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.0",
     "firebase": "^10.4.0",
     "react": "^18.2.0",
@@ -22,9 +24,11 @@
     "react-router-dom": "^6.16.0",
     "react-toggle-dark-mode": "^1.1.1",
     "recharts": "^2.8.0",
-    "swiper": "^10.2.0"
+    "swiper": "^10.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.1.0",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.3",

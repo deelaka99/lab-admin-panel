@@ -11,7 +11,7 @@ import ManageUsers from "../../components/UserManagement/ManageUsers";
 import Payment from "../../components/UserManagement/Payment";
 
 function UserManagement() {
-  const [activeComponent, setActiveComponent] = useState("AddNewLab");
+  const [activeComponent, setActiveComponent] = useState("AddNewUsers");
 
   const handleButtonClick = (componentName) => {
     setActiveComponent(componentName);
