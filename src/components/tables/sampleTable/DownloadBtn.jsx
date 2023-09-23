@@ -1,6 +1,6 @@
 import * as XLSX from "xlsx/xlsx.mjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileArrowDown, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faFileArrowDown } from "@fortawesome/free-solid-svg-icons";
 
 const DownloadBtn = ({ data = [], fileName }) => {
   return (
