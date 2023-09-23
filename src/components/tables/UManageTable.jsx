@@ -7,7 +7,7 @@ const UManageTable = (props) => {
 
   return (
     <div className="h-full w-full rounded">
-      <table className="border border-ternary-blue w-full h-full text-left dark:border-gray2">
+      <table className="border border-ternary-blue w-full h-full text-center dark:border-gray2">
         <thead className="bg-ternary-blue text-primary-blue dark:bg-dark-primary dark:text-gray2">
           {tableName.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>

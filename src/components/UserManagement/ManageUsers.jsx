@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
 import { update, remove, ref, onValue } from "firebase/database";
+import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
 import NotificationModal from "../Modal/NotificationModal";
 import {
   createColumnHelper,
@@ -15,10 +16,19 @@ import DownloadBtn from "../tables/sampleTable/DownloadBtn";
 import DebouncedInput from "../tables/sampleTable/DebouncedInput";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserPlus, faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUserPlus,
+  faFloppyDisk,
+  faPhoneVolume,
+  faLocationDot,
+  faEnvelope,
+  faRuler,
+  faWeightScale,
+} from "@fortawesome/free-solid-svg-icons";
 
 function ManageUsers() {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [userData, setUserData] = useState([]); // State to store retrieved data
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -73,13 +83,23 @@ function ManageUsers() {
       });
   };
 
-  //Remove a lab
-  const removeUser = (slectedUser) => {
-    console.log("selectedUser:", slectedUser); // Check the selectedLab object
+  //Function to hadle remove button
+  const handleRemoveClick = (user) => {
+    const userRef = ref(db, "users/" + user.uid);
+    const imagePath = user.proPic;
+    const imageRef = storageRef(storage, imagePath);
 
-    const userRef = ref(db, "users/" + slectedUser);
+    // Remove the user's profile picture from Firebase Storage
+    deleteObject(imageRef)
+      .then(() => {
+        // Image deleted successfully from Firebase Storage
+        console.log(user.userName,"'s proPic deleted from Firebase Storage");
+      })
+      .catch((error) => {
+        console.error("Error deleting proPic from Firebase Storage:", error);
+      });
 
-    // Remove the lab from Firebase
+    // Remove the user from Firebase database
     remove(userRef)
       .then(() => {
         setShowUserRemoveSuccessModal(true);
@@ -90,12 +110,19 @@ function ManageUsers() {
       });
   };
 
-  // Function to handle edit button click
+  //Function to handle view button
+  const handleViewClick = (user) => {
+    setSelectedUser(user);
+    setShowViewModal(true);
+  };
+
+  // Function to handle edit button
   const handleEditClick = (user) => {
     setSelectedUser(user);
     setShowEditModal(true);
   };
 
+  // Function to handle block/unblock button
   const handleToggleBlock = (user) => {
     //setShowClickAgainModal(true);
     const userRef = ref(db, `users/${user.uid}`);
@@ -110,11 +137,14 @@ function ManageUsers() {
       .then(() => {
         // Data updated successfully
         console.log(
-          "User statues:",user.userName,
+          "User statues:",
+          user.userName,
           updatedBlockedStatus ? "Blocked" : "Unblocked"
         );
         //showing blocked modal success or not
-        updatedBlockedStatus ? setShowUserBlockedModal(true) : setShowUserUnblockedModal(true);
+        updatedBlockedStatus
+          ? setShowUserBlockedModal(true)
+          : setShowUserUnblockedModal(true);
       })
       .catch((error) => {
         console.error("Error blocking user:", error);
@@ -160,7 +190,7 @@ function ManageUsers() {
       cell: (info) => (
         <div className="flex items-center">
           <button
-            className="bg-blue text-white active:bg-black font-bold uppercase text-md px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            className="bg-blue text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
             onClick={() => handleEditClick(info.row.original)}
           >
             Edit
@@ -168,23 +198,23 @@ function ManageUsers() {
           <button
             className={`bg-${
               info.row.original.blocked ? "green" : "yellow"
-            } text-white active:bg-black font-bold uppercase text-md px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
+            } text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
             onClick={() => handleToggleBlock(info.row.original)}
           >
             {info.row.original.blocked ? "Unblock" : "Block"}
           </button>
 
           <button
-            className="bg-blue text-white active:bg-black font-bold uppercase text-md px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-            onClick={() => handleEditClick(info.row.original)}
+            className="bg-white text-blue border active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            onClick={() => handleViewClick(info.row.original)}
           >
-            Edit
+            View
           </button>
           <button
-            className="bg-blue text-white active:bg-black font-bold uppercase text-md px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-            onClick={() => handleEditClick(info.row.original)}
+            className="bg-red-2 text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            onClick={() => handleRemoveClick(info.row.original)}
           >
-            Edit
+            Remove
           </button>
         </div>
       ),
@@ -284,7 +314,7 @@ function ManageUsers() {
           </div>
         </div>
       </div>
-      {/**Edit lab modal */}
+      {/**Edit modal */}
       {showEditModal ? (
         <div>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
@@ -394,6 +424,83 @@ function ManageUsers() {
                     <FontAwesomeIcon icon={faFloppyDisk} />
                     &nbsp; Save
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </div>
+      ) : null}
+
+      {/**view modal */}
+      {showViewModal ? (
+        <div>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-1 rounded-t">
+                  <h3 className="text-xl font-semibold">User Info</h3>
+                  <button
+                    className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
+                    onClick={() => setShowViewModal(false)}
+                  >
+                    <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-3xl block dark:text-white flex items-center justify-center">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="w-full h-full p-3">
+                  <div className="flex p-1">
+                    <div className="h-full w-1/2 p-2">
+                      <div className="flex items-center justify-center ">
+                        <img
+                          className="rounded-full border-4 border-white drop-shadow-lg w-1/2 h-1/2 object-cover"
+                          src={selectedUser.proPic}
+                          alt="proPic"
+                        />
+                      </div>
+                      <p className="h-1/2 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
+                        {selectedUser.userName}
+                      </p>
+                    </div>
+                    <div className="h-full w-1/2 p-2 font-inter">
+                      <div className="w-full h-1/2 text-sm">
+                        <p className="font-bold text-lg pb-3">
+                          Contact Details:
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faPhoneVolume} />
+                          &nbsp;&nbsp;&nbsp;{selectedUser.telephone}
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faEnvelope} />
+                          &nbsp;&nbsp;&nbsp;{selectedUser.email}
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faLocationDot} />
+                          &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
+                          {selectedUser.district},&nbsp;Sri Lanka.
+                        </p>
+                      </div>
+                      <p>&nbsp;</p>
+                      <div className="w-full h-1/2 text-sm">
+                        <p className="font-bold text-lg pb-3">
+                          Biometric Details:
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faRuler} />
+                          &nbsp;&nbsp;&nbsp;100cm
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faWeightScale} />
+                          &nbsp;&nbsp;&nbsp;10Kg
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
