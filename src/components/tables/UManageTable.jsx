@@ -40,7 +40,7 @@ const UManageTable = (props) => {
             ))
           ) : (
             <tr className="text-center h-32">
-              <td colSpan={12}>No Recoard Found!</td>
+              <td colSpan={12}>No Records Found!</td>
             </tr>
           )}
         </tbody>
