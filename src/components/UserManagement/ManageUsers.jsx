@@ -248,10 +248,6 @@ function ManageUsers() {
           <div className="flex items-center justify-end h-full w-1/2 p-3">
             <DownloadBtn data={userData} fileName={"users"} />
             <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-            <button className="p-2 border border-ternary-blue font-inter bg-primary-blue text-ternary-blue text-lg rounded shadow-md hover:shadow-lg hover:text-white hover:border-white dark:bg-black dark:bg-opacity-50 dark:text-gray2 dark:border-gray2 dark:shadow-black dark:hover:text-gray1 dark:hover:border-gray1">
-              <FontAwesomeIcon icon={faUserPlus} />
-              &nbsp;&nbsp;Add New User
-            </button>
           </div>
         </div>
         <div className="flex items-center justify-center w-full h-4/6 max-h-[450px] overflow-y-auto p-3 rounded">
