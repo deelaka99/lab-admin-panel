@@ -478,7 +478,7 @@ function ManageUsers() {
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faLocationDot} />
                           &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
-                          {selectedUser.district},&nbsp;Sri Lanka.
+                          {selectedUser.district},&nbsp;{selectedUser.province} province,&nbsp;Sri Lanka.
                         </p>
                       </div>
                       <p>&nbsp;</p>
