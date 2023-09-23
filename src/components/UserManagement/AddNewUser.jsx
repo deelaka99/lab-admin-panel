@@ -8,6 +8,30 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 
 function AddNewUser() {
+  const provinces = [
+    "Western",
+    "Central",
+    "Southern",
+    "Northern",
+    "Eastern",
+    "North_Western",
+    "North_Central",
+    "Uva",
+    "Sabaragamuwa",
+  ];
+
+  const provinceToDistricts = {
+    Western: ["Colombo", "Gampaha", "Kalutara"],
+    Central: ["Kandy", "Nuwara-Eliya", "Matale"],
+    Southern: ["Galle", "Matara", "Hambanthota"],
+    Northern: ["Jaffna", "Kilinochchi", "Mannar", "Mullaitivu", "Vavuniya"],
+    Eastern: ["Trincomalee", "Batticaloa", "Ampara"],
+    North_Western: ["Kurunegala", "Puttalam"],
+    North_Central: ["Anuradhapura", "Polonnaruwa"],
+    Uva: ["Badulla", "Monaragala"],
+    Sabaragamuwa: ["Ratnapura", "Kegalle"],
+  };
+
   const [showAddedSuccessModal, setShowAddedSuccessModal] = useState(false);
   const [showAddedUnsuccessModal, setShowAddedUnsuccessModal] = useState(false);
   //variable state
@@ -206,7 +230,9 @@ function AddNewUser() {
                     }, 3000); // 3000 milliseconds = 3 seconds
                   })
                   .catch((error) => {
-                    setProPicUploadError("Error occured when uploading Profile picture, Try again!");
+                    setProPicUploadError(
+                      "Error occured when uploading Profile picture, Try again!"
+                    );
                     setShowAddedUnsuccessModal(true);
                     console.log("Error uploading Propic", error);
                   })
@@ -295,20 +321,24 @@ function AddNewUser() {
                   District
                 </div>
                 <div className="h-full w-4/6 p-2">
-                  <input
-                    type="text"
-                    placeholder="Enter district"
+                  <select
                     className={`${
                       districtError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={district}
                     onChange={(e) => {
                       setDistrict(e.target.value);
                       setDistrictError("");
                     }}
-                  />
+                  >
+                    {provinceToDistricts[province].map((district) => (
+                      <option className="text-primary-blue dark:text-gray1" key={district} value={district}>
+                        {district}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="h-1/4 w-full flex">
@@ -382,20 +412,29 @@ function AddNewUser() {
                   Province
                 </div>
                 <div className="h-full w-4/6 p-2">
-                  <input
-                    type="text"
-                    placeholder="Enter province"
+                  <select
                     className={`${
                       provinceError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold`}
                     value={province}
                     onChange={(e) => {
                       setProvince(e.target.value);
+                      setDistrict(provinceToDistricts[e.target.value][0]);
                       setProvinceError("");
                     }}
-                  />
+                  >
+                    {provinces.map((p) => (
+                      <option
+                        className="text-primary-blue dark:text-gray1"
+                        key={p}
+                        value={p}
+                      >
+                        {p}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="h-1/4 w-full flex">
