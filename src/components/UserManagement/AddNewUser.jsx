@@ -220,7 +220,7 @@ function AddNewUser() {
                       email,
                       proPic: downloadURL,
                       type: "user",
-                      blocked: false,
+                      blocked: true,
                     });
 
                     setShowAddedSuccessModal(true);
