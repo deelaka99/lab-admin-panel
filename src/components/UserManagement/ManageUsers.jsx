@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db, storage } from "../../firebase";
 import { update, remove, ref, onValue } from "firebase/database";
-import { getStorage, ref as storageRef, deleteObject } from "firebase/storage";
+import { ref as storageRef, deleteObject } from "firebase/storage";
 import NotificationModal from "../Modal/NotificationModal";
 import {
   createColumnHelper,
@@ -246,12 +246,8 @@ function ManageUsers() {
             />
           </div>
           <div className="flex items-center justify-end h-full w-1/2 p-3">
-            <DownloadBtn data={data} fileName={"users"} />
+            <DownloadBtn data={userData} fileName={"users"} />
             <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-            <button className="p-2 border border-ternary-blue font-inter bg-primary-blue text-ternary-blue text-lg rounded shadow-md hover:shadow-lg hover:text-white hover:border-white dark:bg-black dark:bg-opacity-50 dark:text-gray2 dark:border-gray2 dark:shadow-black dark:hover:text-gray1 dark:hover:border-gray1">
-              <FontAwesomeIcon icon={faUserPlus} />
-              &nbsp;&nbsp;Add New User
-            </button>
           </div>
         </div>
         <div className="flex items-center justify-center w-full h-4/6 max-h-[450px] overflow-y-auto p-3 rounded">
@@ -482,7 +478,7 @@ function ManageUsers() {
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faLocationDot} />
                           &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
-                          {selectedUser.district},&nbsp;Sri Lanka.
+                          {selectedUser.district},&nbsp;{selectedUser.province} province,&nbsp;Sri Lanka.
                         </p>
                       </div>
                       <p>&nbsp;</p>
