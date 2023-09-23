@@ -17,7 +17,6 @@ import DebouncedInput from "../tables/sampleTable/DebouncedInput";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUserPlus,
   faFloppyDisk,
   faPhoneVolume,
   faLocationDot,
@@ -40,9 +39,6 @@ function Payment() {
     useState(false);
   const [showUserRemoveUnsuccessModal, setShowUserRemoveUnsuccessModal] =
     useState(false);
-  const [blockedStatus, setBlockedStatus] = useState(
-    userData.map(() => false) // Initialize with all labs as unblocked
-  );
   const [showUserBlockedModal, setShowUserBlockedModal] = useState(false);
   const [showUserUnblockedModal, setShowUserUnblockedModal] = useState(false);
 
@@ -155,66 +151,41 @@ function Payment() {
 
   const columns = [
     columnHelper.accessor("", {
-      id: "U.No",
+      id: "P.No",
       cell: (info) => <span>{info.row.index + 1}</span>,
-      header: "U.No",
-    }),
-    columnHelper.accessor("proPic", {
-      cell: (info) => (
-        <img
-          src={info?.getValue()}
-          alt="proPic"
-          className="rounded-full border w-10 h-10 object-cover"
-        />
-      ),
-      header: "Profile Pic",
+      header: "P.No",
     }),
     columnHelper.accessor("userName", {
       cell: (info) => <span>{info.getValue()}</span>,
       header: "Name",
     }),
-    columnHelper.accessor("telephone", {
+    columnHelper.accessor("method", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Telephone",
+      header: "Payment method",
     }),
-    columnHelper.accessor("address", {
+    columnHelper.accessor("date", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Address",
+      header: "Payment date",
     }),
-    columnHelper.accessor("district", {
+    columnHelper.accessor("time", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "District",
+      header: "Payment time",
     }),
     columnHelper.accessor("", {
       header: "Action",
       cell: (info) => (
         <div className="flex items-center">
           <button
-            className="bg-blue text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            className="bg-white text-blue border active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
             onClick={() => handleEditClick(info.row.original)}
           >
-            Edit
+            Send a mail
           </button>
           <button
-            className={`bg-${
-              info.row.original.blocked ? "green" : "yellow"
-            } text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
-            onClick={() => handleToggleBlock(info.row.original)}
-          >
-            {info.row.original.blocked ? "Unblock" : "Block"}
-          </button>
-
-          <button
-            className="bg-white text-blue border active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            className="bg-blue text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
             onClick={() => handleViewClick(info.row.original)}
           >
-            View
-          </button>
-          <button
-            className="bg-red-2 text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-            onClick={() => handleRemoveClick(info.row.original)}
-          >
-            Remove
+            View User
           </button>
         </div>
       ),
