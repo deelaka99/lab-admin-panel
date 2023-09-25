@@ -11,7 +11,7 @@ import ManageReports from "../../components/reportManagement/ManageReports";
 import SendReports from "../../components/reportManagement/SendReports";
 
 function ReportManagement() {
-  const [activeComponent, setActiveComponent] = useState("AddNewUsers");
+  const [activeComponent, setActiveComponent] = useState("AddNewReport");
 
   const handleButtonClick = (componentName) => {
     setActiveComponent(componentName);
