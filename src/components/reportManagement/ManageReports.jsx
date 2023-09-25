@@ -313,7 +313,7 @@ function ManageUsers() {
               <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
                 {/*header*/}
                 <div className="flex items-start justify-between p-1 rounded-t">
-                  <h3 className="text-xl font-semibold">Edit Report-type</h3>
+                  <h3 className="text-xl font-semibold">Edit Report Type</h3>
                   <button
                     className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
                     onClick={() => setShowEditModal(false)}
@@ -326,14 +326,14 @@ function ManageUsers() {
                 {/*body*/}
                 <div className="relative p-2 flex flex-col">
                   <form>
-                    <div className="h-1/5 w-full flex flex-col">
+                    <div className="h-1/6 w-full flex flex-col">
                       <div className="">
                         <p className="font-semibold">Type Name :</p>
                       </div>
                       <div className="pt-2 pb-2">
                         <input
                           type="text"
-                          placeholder="Enter new Lab name"
+                          placeholder="Enter new report type-name"
                           className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
                           value={selectedReportType.typeName}
                           onChange={(e) =>
@@ -345,67 +345,170 @@ function ManageUsers() {
                         />
                       </div>
                     </div>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div>
-                        <p className="font-semibold">Address :</p>
+                    <div className="h-1/6 w-full flex">
+                      <div className="h-full w-1/2 pr-1">
+                        <div>
+                          <p className="font-semibold">Metric 1:</p>
+                        </div>
+                        <div className="pt-2 pb-2">
+                          <input
+                            type="text"
+                            placeholder="Enter new metric 1"
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                            value={selectedReportType.metric1}
+                            onChange={(e) =>
+                              setSelectedReportType({
+                                ...selectedReportType,
+                                metric1: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new Address"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedReportType.typeName}
-                          onChange={(e) =>
-                            setSelectedReportType({
-                              ...selectedReportType,
-                              typeName: e.target.value,
-                            })
-                          }
-                        />
+                      <div className="h-full w-1/2 pl-1">
+                        <div>
+                          <p className="font-semibold">Metric 1 Value:</p>
+                        </div>
+                        <div className="pt-2 pb-2">
+                          <input
+                            type="text"
+                            placeholder="Enter new metric 1 value"
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                            value={selectedReportType.metricVal1}
+                            onChange={(e) =>
+                              setSelectedReportType({
+                                ...selectedReportType,
+                                metricVal1: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div>
-                        <p className="font-semibold">District :</p>
+                    <div className="h-1/6 w-full flex">
+                      <div className="h-full w-1/2 pr-1">
+                        <div>
+                          <p className="font-semibold">Metric 2:</p>
+                        </div>
+                        <div className="pt-2 pb-2">
+                          <input
+                            type="text"
+                            placeholder="Enter new metric 2"
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                            value={selectedReportType.metric2}
+                            onChange={(e) =>
+                              setSelectedReportType({
+                                ...selectedReportType,
+                                metric2: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new E-mail"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedReportType.typeName}
-                          onChange={(e) =>
-                            setSelectedReportType({
-                              ...selectedReportType,
-                              typeName: e.target.value,
-                            })
-                          }
-                        />
+                      <div className="h-full w-1/2 pl-1">
+                        <div>
+                          <p className="font-semibold">Metric 2 Value:</p>
+                        </div>
+                        <div className="pt-2 pb-2">
+                          <input
+                            type="text"
+                            placeholder="Enter new metric 2 value"
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                            value={selectedReportType.metricVal2}
+                            onChange={(e) =>
+                              setSelectedReportType({
+                                ...selectedReportType,
+                                metricVal2: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div>
-                        <p className="font-semibold">Telephone :</p>
+                    <div className="h-1/6 w-full flex">
+                      <div className="h-full w-1/2 pr-1">
+                        <div>
+                          <p className="font-semibold">Metric 3:</p>
+                        </div>
+                        <div className="pt-2 pb-2">
+                          <input
+                            type="text"
+                            placeholder="Enter new metric 3"
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                            value={selectedReportType.metric3}
+                            onChange={(e) =>
+                              setSelectedReportType({
+                                ...selectedReportType,
+                                metric3: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new Telephone"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedReportType.typeName}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedReportType,
-                              typeName: e.target.value,
-                            })
-                          }
-                        />
+                      <div className="h-full w-1/2 pl-1">
+                        <div>
+                          <p className="font-semibold">Metric 3 Value:</p>
+                        </div>
+                        <div className="pt-2 pb-2">
+                          <input
+                            type="text"
+                            placeholder="Enter new metric 3 value"
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                            value={selectedReportType.metricVal3}
+                            onChange={(e) =>
+                              setSelectedReportType({
+                                ...selectedReportType,
+                                metricVal3: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-1/6 w-full flex">
+                      <div className="h-full w-1/2 pr-1">
+                        <div>
+                          <p className="font-semibold">Metric 4:</p>
+                        </div>
+                        <div className="pt-2 pb-2">
+                          <input
+                            type="text"
+                            placeholder="Enter new metric 4"
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                            value={selectedReportType.metric4}
+                            onChange={(e) =>
+                              setSelectedReportType({
+                                ...selectedReportType,
+                                metric4: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className="h-full w-1/2 pl-1">
+                        <div>
+                          <p className="font-semibold">Metric 4 Value:</p>
+                        </div>
+                        <div className="pt-2 pb-2">
+                          <input
+                            type="text"
+                            placeholder="Enter new metric 4 value"
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                            value={selectedReportType.metricVal4}
+                            onChange={(e) =>
+                              setSelectedReportType({
+                                ...selectedReportType,
+                                metricVal4: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
                       </div>
                     </div>
                   </form>
                 </div>
                 {/*footer*/}
-                <div className="flex items-center justify-center p-1 rounded-b">
+                <div className="flex items-center justify-center rounded-b">
                   <button
                     className="bg-primary-blue text-white active:bg-black font-bold uppercase text-md px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:bg-dark-primary"
                     type="button"
