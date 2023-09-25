@@ -16,138 +16,134 @@ import DownloadBtn from "../tables/sampleTable/DownloadBtn";
 import DebouncedInput from "../tables/sampleTable/DebouncedInput";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUserPlus,
-  faFloppyDisk,
-  faPhoneVolume,
-  faLocationDot,
-  faEnvelope,
-  faRuler,
-  faWeightScale,
-} from "@fortawesome/free-solid-svg-icons";
+import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
 
 function ManageUsers() {
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [userData, setUserData] = useState([]); // State to store retrieved data
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [reportTypeData, setReportTypeData] = useState([]); // State to store retrieved data
+  const [selectedReportType, setSelectedReportType] = useState(null);
 
-  const [showUserUpdateSuccessModal, setShowUserUpdateSuccessModal] =
+  const [
+    showReportTypeUpdateSuccessModal,
+    setShowReportTypeUpdateSuccessModal,
+  ] = useState(false);
+  const [
+    showReportTypeUpdateUnsuccessModal,
+    setShowReportTypeUpdateUnsuccessModal,
+  ] = useState(false);
+  const [
+    showReportTypeRemoveSuccessModal,
+    setShowReportTypeRemoveSuccessModal,
+  ] = useState(false);
+  const [
+    showReportTypeRemoveUnsuccessModal,
+    setShowReportTypeRemoveUnsuccessModal,
+  ] = useState(false);
+  const [showReportTypeActivateModal, setShowReportTypeActivateModal] =
     useState(false);
-  const [showUserUpdateUnsuccessModal, setShowUserUpdateUnsuccessModal] =
+  const [showReportTypeDeactivateModal, setShowReportTypeDeactivateModal] =
     useState(false);
-  const [showUserRemoveSuccessModal, setShowUserRemoveSuccessModal] =
-    useState(false);
-  const [showUserRemoveUnsuccessModal, setShowUserRemoveUnsuccessModal] =
-    useState(false);
-  const [blockedStatus, setBlockedStatus] = useState(
-    userData.map(() => false) // Initialize with all labs as unblocked
-  );
-  const [showUserBlockedModal, setShowUserBlockedModal] = useState(false);
-  const [showUserUnblockedModal, setShowUserUnblockedModal] = useState(false);
 
   // useEffect hook to fetch data from Firebase
   useEffect(() => {
-    const userRef = ref(db, "users");
-    onValue(userRef, (snapshot) => {
-      const userData = [];
+    const reportTypeRef = ref(db, "reportTypes");
+    onValue(reportTypeRef, (snapshot) => {
+      const reportTypeData = [];
       snapshot.forEach((childSnapshot) => {
-        const user = childSnapshot.val();
-        userData.push(user);
+        const reportType = childSnapshot.val();
+        reportTypeData.push(reportType);
       });
-      setUserData(userData);
+      setReportTypeData(reportTypeData);
     });
   }, []);
 
   // user update function
-  const updateUserData = () => {
-    const userRef = ref(db, `users/${selectedUser.uid}`);
+  const updateReportTypeData = () => {
+    const reportTypeRef = ref(db, `reportTypes/${selectedReportType.typeName}`);
     const updates = {
-      userName: selectedUser.userName,
-      telephone: selectedUser.telephone,
-      address: selectedUser.address,
-      district: selectedUser.district,
+      typeName: selectedReportType.typeName,
+      metric1: selectedReportType.metric1,
+      metric2: selectedReportType.metric2,
+      metric3: selectedReportType.metric3,
+      metric4: selectedReportType.metric4,
+      metricVal1: selectedReportType.metricVal1,
+      metricVal2: selectedReportType.metricVal2,
+      metricVal3: selectedReportType.metricVal3,
+      metricVal4: selectedReportType.metricVal4,
     };
 
     // Update the data in Firebase realtime
-    update(userRef, updates)
+    update(reportTypeRef, updates)
       .then(() => {
         // Data updated successfully
-        console.log("User data updated!");
+        console.log("Report-type data updated!");
         setShowEditModal(false); // Close the Edit modal
-        setShowUserUpdateSuccessModal(true);
+        setShowReportTypeUpdateSuccessModal(true);
       })
       .catch((error) => {
-        console.error("Error updating User data:", error);
-        setShowUserUpdateUnsuccessModal(true);
+        console.error("Error updating report-type data:", error);
+        setShowReportTypeUpdateUnsuccessModal(true);
       });
   };
 
   //Function to hadle remove button
-  const handleRemoveClick = (user) => {
-    const userRef = ref(db, "users/" + user.uid);
-    const imagePath = user.proPic;
+  const handleRemoveClick = (typeName) => {
+    const reportTypeRef = ref(db, "reportTypes/" + typeName.typeName);
+    const imagePath = typeName.reportIcon;
     const imageRef = storageRef(storage, imagePath);
 
     // Remove the user's profile picture from Firebase Storage
     deleteObject(imageRef)
       .then(() => {
         // Image deleted successfully from Firebase Storage
-        console.log(user.userName,"'s proPic deleted from Firebase Storage");
+        console.log("Icon deleted from Firebase Storage");
       })
       .catch((error) => {
-        console.error("Error deleting proPic from Firebase Storage:", error);
+        console.error("Error deleting Icon from Firebase Storage:", error);
       });
 
-    // Remove the user from Firebase database
-    remove(userRef)
+    // Remove the report-type from Firebase database
+    remove(reportTypeRef)
       .then(() => {
-        setShowUserRemoveSuccessModal(true);
+        setShowReportTypeRemoveSuccessModal(true);
       })
       .catch((error) => {
-        console.error("Error removing user:", error);
-        setShowUserRemoveUnsuccessModal(true);
+        console.error("Error removing report-type:", error);
+        setShowReportTypeRemoveUnsuccessModal(true);
       });
-  };
-
-  //Function to handle view button
-  const handleViewClick = (user) => {
-    setSelectedUser(user);
-    setShowViewModal(true);
   };
 
   // Function to handle edit button
-  const handleEditClick = (user) => {
-    setSelectedUser(user);
+  const handleEditClick = (reportType) => {
+    setSelectedReportType(reportType);
     setShowEditModal(true);
   };
 
-  // Function to handle block/unblock button
-  const handleToggleBlock = (user) => {
-    //setShowClickAgainModal(true);
-    const userRef = ref(db, `users/${user.uid}`);
-    // Update the blocked status of the user in Firebase
-    const updatedBlockedStatus = !user.blocked;
+  // Function to handle active button
+  const handleToggleActive = (reportType) => {
+    const reportTypeRef = ref(db, "reportTypes/" + reportType.typeName);
+    // Update the active status of the report-type in Firebase
+    const updatedActiveStatus = !reportType.activeStatus;
     const updates = {
-      blocked: updatedBlockedStatus,
+      activeStatus: updatedActiveStatus,
     };
 
     // Update the data in Firebase
-    update(userRef, updates)
+    update(reportTypeRef, updates)
       .then(() => {
         // Data updated successfully
         console.log(
-          "User statues:",
-          user.userName,
-          updatedBlockedStatus ? "Blocked" : "Unblocked"
+          "Report-type active statues:",
+          reportType.typeName,
+          updatedActiveStatus ? "Activated" : "Deactivated"
         );
-        //showing blocked modal success or not
-        updatedBlockedStatus
-          ? setShowUserBlockedModal(true)
-          : setShowUserUnblockedModal(true);
+        //showing activated modal success or not
+        updatedActiveStatus
+          ? setShowReportTypeActivateModal(true)
+          : setShowReportTypeDeactivateModal(true);
       })
       .catch((error) => {
-        console.error("Error blocking user:", error);
+        console.error("Error activating report-type:", error);
       });
   };
 
@@ -155,35 +151,39 @@ function ManageUsers() {
 
   const columns = [
     columnHelper.accessor("", {
-      id: "U.No",
+      id: "No",
       cell: (info) => <span>{info.row.index + 1}</span>,
-      header: "U.No",
+      header: "No",
     }),
-    columnHelper.accessor("proPic", {
+    columnHelper.accessor("reportIcon", {
       cell: (info) => (
         <img
           src={info?.getValue()}
-          alt="proPic"
+          alt="reportIcon"
           className="rounded-full border w-10 h-10 object-cover"
         />
       ),
-      header: "Profile Pic",
+      header: "Icon",
     }),
-    columnHelper.accessor("userName", {
+    columnHelper.accessor("typeName", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Name",
+      header: "Report Type",
     }),
-    columnHelper.accessor("telephone", {
+    columnHelper.accessor("metric1", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Telephone",
+      header: "Metric_1",
     }),
-    columnHelper.accessor("address", {
+    columnHelper.accessor("metric2", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "Address",
+      header: "Metric_2",
     }),
-    columnHelper.accessor("district", {
+    columnHelper.accessor("metric3", {
       cell: (info) => <span>{info.getValue()}</span>,
-      header: "District",
+      header: "Metric_3",
+    }),
+    columnHelper.accessor("metric4", {
+      cell: (info) => <span>{info.getValue()}</span>,
+      header: "Metric_4",
     }),
     columnHelper.accessor("", {
       header: "Action",
@@ -197,18 +197,13 @@ function ManageUsers() {
           </button>
           <button
             className={`bg-${
-              info.row.original.blocked ? "green" : "yellow"
-            } text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
-            onClick={() => handleToggleBlock(info.row.original)}
+              info.row.original.activeStatus ? "yellow" : "green"
+            } text-${
+              info.row.original.activeStatus ? "black" : "white"
+            } active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
+            onClick={() => handleToggleActive(info.row.original)}
           >
-            {info.row.original.blocked ? "Unblock" : "Block"}
-          </button>
-
-          <button
-            className="bg-white text-blue border active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-            onClick={() => handleViewClick(info.row.original)}
-          >
-            View
+            {info.row.original.activeStatus ? "Deactivate" : "Activate"}
           </button>
           <button
             className="bg-red-2 text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -220,11 +215,10 @@ function ManageUsers() {
       ),
     }),
   ];
-  const [data] = useState(() => [...userData]);
   const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
-    data: userData,
+    data: reportTypeData,
     columns,
     state: {
       globalFilter,
@@ -246,7 +240,7 @@ function ManageUsers() {
             />
           </div>
           <div className="flex items-center justify-end h-full w-1/2 p-3">
-            <DownloadBtn data={userData} fileName={"users"} />
+            <DownloadBtn data={reportTypeData} fileName={"reportTypes"} />
             <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
           </div>
         </div>
@@ -319,7 +313,7 @@ function ManageUsers() {
               <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
                 {/*header*/}
                 <div className="flex items-start justify-between p-1 rounded-t">
-                  <h3 className="text-xl font-semibold">Edit Lab</h3>
+                  <h3 className="text-xl font-semibold">Edit Report-type</h3>
                   <button
                     className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
                     onClick={() => setShowEditModal(false)}
@@ -334,18 +328,18 @@ function ManageUsers() {
                   <form>
                     <div className="h-1/5 w-full flex flex-col">
                       <div className="">
-                        <p className="font-semibold">User Name :</p>
+                        <p className="font-semibold">Type Name :</p>
                       </div>
                       <div className="pt-2 pb-2">
                         <input
                           type="text"
                           placeholder="Enter new Lab name"
                           className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.userName}
+                          value={selectedReportType.typeName}
                           onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              userName: e.target.value,
+                            setSelectedReportType({
+                              ...selectedReportType,
+                              typeName: e.target.value,
                             })
                           }
                         />
@@ -360,11 +354,11 @@ function ManageUsers() {
                           type="text"
                           placeholder="Enter new Address"
                           className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.address}
+                          value={selectedReportType.typeName}
                           onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              address: e.target.value,
+                            setSelectedReportType({
+                              ...selectedReportType,
+                              typeName: e.target.value,
                             })
                           }
                         />
@@ -379,11 +373,11 @@ function ManageUsers() {
                           type="text"
                           placeholder="Enter new E-mail"
                           className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.district}
+                          value={selectedReportType.typeName}
                           onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              district: e.target.value,
+                            setSelectedReportType({
+                              ...selectedReportType,
+                              typeName: e.target.value,
                             })
                           }
                         />
@@ -398,11 +392,11 @@ function ManageUsers() {
                           type="text"
                           placeholder="Enter new Telephone"
                           className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.telephone}
+                          value={selectedReportType.typeName}
                           onChange={(e) =>
                             setSelectedUser({
-                              ...selectedUser,
-                              telephone: e.target.value,
+                              ...selectedReportType,
+                              typeName: e.target.value,
                             })
                           }
                         />
@@ -415,7 +409,7 @@ function ManageUsers() {
                   <button
                     className="bg-primary-blue text-white active:bg-black font-bold uppercase text-md px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:bg-dark-primary"
                     type="button"
-                    onClick={updateUserData}
+                    onClick={updateReportTypeData}
                   >
                     <FontAwesomeIcon icon={faFloppyDisk} />
                     &nbsp; Save
@@ -428,158 +422,81 @@ function ManageUsers() {
         </div>
       ) : null}
 
-      {/**view modal */}
-      {showViewModal ? (
-        <div>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              {/*content*/}
-              <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
-                {/*header*/}
-                <div className="flex items-start justify-between p-1 rounded-t">
-                  <h3 className="text-xl font-semibold">User Info</h3>
-                  <button
-                    className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
-                    onClick={() => setShowViewModal(false)}
-                  >
-                    <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-3xl block dark:text-white flex items-center justify-center">
-                      ×
-                    </span>
-                  </button>
-                </div>
-                {/*body*/}
-                <div className="w-full h-full p-3">
-                  <div className="flex p-1">
-                    <div className="h-full w-1/2 p-2">
-                      <div className="flex items-center justify-center ">
-                        <img
-                          className="rounded-full border-4 border-white drop-shadow-lg w-1/2 h-1/2 object-cover"
-                          src={selectedUser.proPic}
-                          alt="proPic"
-                        />
-                      </div>
-                      <p className="h-1/2 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
-                        {selectedUser.userName}
-                      </p>
-                    </div>
-                    <div className="h-full w-1/2 p-2 font-inter">
-                      <div className="w-full h-1/2 text-sm">
-                        <p className="font-bold text-lg pb-3">
-                          Contact Details:
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faPhoneVolume} />
-                          &nbsp;&nbsp;&nbsp;{selectedUser.telephone}
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faEnvelope} />
-                          &nbsp;&nbsp;&nbsp;{selectedUser.email}
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faLocationDot} />
-                          &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
-                          {selectedUser.district},&nbsp;{selectedUser.province} province,&nbsp;Sri Lanka.
-                        </p>
-                      </div>
-                      <p>&nbsp;</p>
-                      <div className="w-full h-1/2 text-sm">
-                        <p className="font-bold text-lg pb-3">
-                          Biometric Details:
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faRuler} />
-                          &nbsp;&nbsp;&nbsp;100cm
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faWeightScale} />
-                          &nbsp;&nbsp;&nbsp;10Kg
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
-        </div>
-      ) : null}
-
-      {/**User update success modal */}
-      {showUserUpdateSuccessModal ? (
+      {/**Report-type update success modal */}
+      {showReportTypeUpdateSuccessModal ? (
         <NotificationModal
-          show={showUserUpdateSuccessModal}
+          show={showReportTypeUpdateSuccessModal}
           onClose={() => {
-            setShowUserUpdateSuccessModal(false);
+            setShowReportTypeUpdateSuccessModal(false);
           }}
           title="Notification"
-          body="User Updated Successfull! 😎"
+          body="Report-type Updated Successfull! 😎"
           color="green"
         />
       ) : null}
 
-      {/**User update Unsuccess modal */}
-      {showUserUpdateSuccessModal ? (
+      {/**Report-type update Unsuccess modal */}
+      {showReportTypeUpdateUnsuccessModal ? (
         <NotificationModal
-          show={showUserUpdateUnsuccessModal}
+          show={showReportTypeUpdateUnsuccessModal}
           onClose={() => {
-            setShowUserUpdateUnsuccessModal(false);
+            setShowReportTypeUpdateUnsuccessModal(false);
           }}
           title="Notification"
-          body="User Updated Unsuccessfull! 😥"
+          body="Report-type Updated Unsuccessfull! 😥"
           color="red"
         />
       ) : null}
 
-      {/**User remove success modal */}
-      {showUserRemoveSuccessModal ? (
+      {/**Report-type remove success modal */}
+      {showReportTypeRemoveSuccessModal ? (
         <NotificationModal
-          show={showUserRemoveSuccessModal}
+          show={showReportTypeRemoveSuccessModal}
           onClose={() => {
-            setShowUserRemoveSuccessModal(false);
+            setShowReportTypeRemoveSuccessModal(false);
           }}
           title="Notification"
-          body="User Removed! 🤔"
+          body="Report-type Removed! 🤔"
           color="red"
         />
       ) : null}
 
-      {/**User remove unsuccess modal */}
-      {showUserRemoveUnsuccessModal ? (
+      {/**Report-type remove unsuccess modal */}
+      {showReportTypeRemoveUnsuccessModal ? (
         <NotificationModal
-          show={showUserRemoveUnsuccessModal}
+          show={showReportTypeRemoveUnsuccessModal}
           onClose={() => {
-            setShowUserRemoveUnsuccessModal(false);
+            setShowReportTypeRemoveUnsuccessModal(false);
           }}
           title="Notification"
-          body="User Removal Unsuccessfull! 🤗"
+          body="Report-type Removal Unsuccessfull! 🤗"
           color="red"
         />
       ) : null}
 
-      {/**User blocked success modal */}
-      {showUserBlockedModal ? (
+      {/**Report-type activate success modal */}
+      {showReportTypeActivateModal ? (
         <NotificationModal
-          show={showUserBlockedModal}
+          show={showReportTypeActivateModal}
           onClose={() => {
-            setShowUserBlockedModal(false);
+            setShowReportTypeActivateModal(false);
           }}
           title="Notification"
-          body="User Blocked! 🤔"
+          body="Report-type activated! 🤗"
+          color="green"
+        />
+      ) : null}
+
+      {/**Report-type deactivate success modal */}
+      {showReportTypeDeactivateModal ? (
+        <NotificationModal
+          show={showReportTypeDeactivateModal}
+          onClose={() => {
+            setShowReportTypeDeactivateModal(false);
+          }}
+          title="Notification"
+          body="Report-type deactivated! 🤔"
           color="yellow"
-        />
-      ) : null}
-
-      {/**User unblocked success modal */}
-      {showUserUnblockedModal ? (
-        <NotificationModal
-          show={showUserUnblockedModal}
-          onClose={() => {
-            setShowUserUnblockedModal(false);
-          }}
-          title="Notification"
-          body="User UnBlocked! 🤗"
-          color="green"
         />
       ) : null}
     </>

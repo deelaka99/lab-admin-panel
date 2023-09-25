@@ -11,7 +11,7 @@ function AddNewReport() {
   //variable state
   const [operatorName, setOperatorName] = useState("");
   const [typeName, setTypeName] = useState("");
-  const [suspendStatus, setSuspendStatus] = useState(false);
+  const activeStatus = false;
   const [metric1, setMetric1] = useState("");
   const [metric2, setMetric2] = useState("");
   const [metric3, setMetric3] = useState("");
@@ -103,7 +103,7 @@ function AddNewReport() {
               typeName,
               operatorName,
               reportIcon: downloadURL,
-              suspendStatus,
+              activeStatus,
               metric1,
               metric2,
               metric3,
