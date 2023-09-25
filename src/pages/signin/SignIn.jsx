@@ -1,30 +1,101 @@
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import React, { useState } from "react";
-import { auth} from "../../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useEffect, useState } from "react";
+import { auth, db, logout } from "../../firebase";
+import { ref, get } from "firebase/database";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
-import googleLogo from "../../assets/images/google.png";
 
-function SignIn(props) {
+function SignIn() {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
   const [_user, setUser] = useState("");
-  const { userTypeError } = props;
+  const [loading, setLoading] = useState(false);
+  const [userTypeError, setUserTypeError] = useState(false);
 
   const signIn = (e) => {
+    setLoading(true);
     e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        setUser(user);
-        localStorage.setItem("gmail", true);
-        if (user) navigate("/admin/dashboard");
-      })
-      .catch((e) => {
-        setError(true);
-      });
+    if (user === null) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          const currentUser = auth.currentUser;
+
+          // Get the user type from Firebase Realtime Database
+          const labTypeRef = ref(db, `labs/${currentUser.uid}/type`);
+
+          // Use the `get` function to fetch the user type
+          get(labTypeRef)
+            .then((snapshot) => {
+              if (snapshot.exists()) {
+                const userType = snapshot.val();
+
+                // Check if the user type is "lab"
+                if (userType === "lab") {
+                  // Get the blocked statues from Firebase Realtime Database
+                  const labBlockRef = ref(
+                    db,
+                    `labs/${currentUser.uid}/blocked`
+                  );
+                  // Use the `get` function to fetch the blocked status
+                  get(labBlockRef)
+                    .then((snapshot) => {
+                      if (snapshot.exists()) {
+                        const blockedStatus = snapshot.val();
+                        // Check if the blocked status is "false"
+                        if (blockedStatus === false) {
+                          setUserTypeError(false);
+                          console.log(
+                            currentUser.email,
+                            " is signed in successfully!"
+                          );
+                          setUser(currentUser);
+                          localStorage.setItem("gmail", true);
+                          if (currentUser) navigate("/admin/dashboard");
+                          setError(false);
+                          setLoading(false);
+                        } else {
+                          setLoading(false);
+                          logout();
+                          setError(true);
+                          console.log(currentUser.email, " is blocked");
+                        }
+                      }
+                    })
+                    .catch((error) => {
+                      setLoading(false);
+                      console.log("Blocked status getting error :", error);
+                    });
+                } else {
+                  console.log("User type isn't match!");
+                  logout();
+                  setError(true);
+                  setUserTypeError(true);
+                }
+              } else {
+                // If the lab doesn't exist for the user, show an error
+                console.log("Lab not found for the user!");
+                setLoading(false);
+                logout();
+                setError(true);
+                setUserTypeError(true);
+              }
+            })
+            .catch((error) => {
+              setLoading(false);
+              console.log("Error getting user type: ", error);
+              setError(true);
+              setUserTypeError(true);
+            });
+        })
+        .catch((e) => {
+          console.log("Sign in errors: ", e);
+          setError(true);
+          setLoading(false);
+        });
+    }
   };
 
   return (
@@ -91,10 +162,13 @@ function SignIn(props) {
               <div className="w-5/6 h-1/2">
                 <div className="w-full h-1/6 text-red font-inter text-center font-bold p-3">
                   {/**login errors displaying  here */}
-                  {error && <span>Invalid Email or Password!</span> &&
-                  userTypeError === 1 ? (
-                    <span>User type doesn't match!</span>
-                  ) : null}
+                  {error && (
+                    <span>
+                      {userTypeError
+                        ? "User type doesn't match!"
+                        : "Invalid Email or Password!"}
+                    </span>
+                  )}
                 </div>
                 <div className="flex w-full h-1/4">
                   <div className="w-1/2 h-full flex items-center justify-center">
@@ -128,6 +202,14 @@ function SignIn(props) {
       </div>
       {/*right container*/}
       <div className="h-full w-1/2 bg-primary-blue opacity-80"></div>
+      {loading ? (
+        <>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue">
+            <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-primary-blue"></div>
+          </div>
+          <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
     </div>
   );
 }

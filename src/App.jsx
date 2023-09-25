@@ -13,37 +13,18 @@ import AboutUs from "./pages/about-us/AboutUs";
 import Settings from "./pages/settings/Settings";
 
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db, logout } from "./firebase";
-import { ref, onValue } from "firebase/database";
+import { auth } from "./firebase";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
   const [user] = useAuthState(auth);
-  const [userTypeError, setUserTypeError] = useState(0);
-  
+
   useEffect(() => {
-    if (user == null) {
+    if (user === null) {
       localStorage.removeItem("gmail");
       setIsLoggedIn(false);
     } else {
-      //checking the user type is match or not
-      const labRef = ref(db, `labs/${user.uid}/type`);
-      onValue(labRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const userType = snapshot.val();
-          // Redirect based on user role
-          if (userType === "lab") {
-            const _user = JSON.parse(localStorage.getItem("gmail"));
-            console.log(user.email, " is signed in successfully!");
-            setIsLoggedIn(true);
-          } else {
-            setIsLoggedIn(false);
-            console.log("User type isn't match!");
-            setUserTypeError(1);
-            logout();
-          }
-        }
-      });
+      setIsLoggedIn(true);
     }
   }, [user]);
 
@@ -77,7 +58,7 @@ function App() {
                     isLoggedIn ? (
                       <Navigate to={"admin/dashboard"} />
                     ) : (
-                      <SignIn userTypeError={userTypeError} />
+                      <SignIn />
                     )
                   }
                 />
