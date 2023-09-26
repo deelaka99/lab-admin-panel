@@ -18,6 +18,7 @@ function Dashboard() {
   const [registeredUserCount, setRegisteredUserCount] = useState(0);
   const [blockedUserCount, setBlockedUserCount] = useState(0);
   const [activeUserCount, setActiveUserCount] = useState(0);
+  const [repTypesCount, setRepTypesCount] = useState(0);
 
   useEffect(() => {
     // Fetch registered users count
@@ -48,6 +49,23 @@ function Dashboard() {
         setLoading(false);
       }
     });
+
+    // Fetch report-type count
+    const repTypeRef = ref(db, "reportTypes/");
+    onValue(repTypeRef, (snapshot) => {
+      try {
+        setLoading(true);
+        if (snapshot.exists()) {
+          const repTypeData = snapshot.val();
+          const repTypeCount = Object.keys(repTypeData).length;
+          setRepTypesCount(repTypeCount);
+        }
+      } catch (error) {
+        console.log("Error in reportTypes fetching: ", error);
+      } finally {
+        setLoading(false);
+      }
+    });
   }, []);
 
   return (
@@ -61,7 +79,7 @@ function Dashboard() {
               </h1>
             </div>
             <div className="flex justify-center items-center w-full h-5/6 p-5">
-              <Card color={"blue"} title={"Report Types"} count={"18"} />
+              <Card color={"blue"} title={"Report Types"} count={repTypesCount} />
               <p>&nbsp;&nbsp;&nbsp;</p>
               <Card color={"blue"} title={"Pending Reports"} count={"22"} />
               <p>&nbsp;&nbsp;&nbsp;</p>
