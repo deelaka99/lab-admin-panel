@@ -28,8 +28,11 @@ import {
 function Payment() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [userData, setUserData] = useState([]); // State to store retrieved data
+  const [userData, setUserData] = useState([]);
+  const [repTypeData, setRepTypeData] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [reportType, setReportType] = useState("");
+  const [userName, setUserName] = useState("");
 
   const [showUserUpdateSuccessModal, setShowUserUpdateSuccessModal] =
     useState(false);
@@ -44,6 +47,7 @@ function Payment() {
 
   // useEffect hook to fetch data from Firebase
   useEffect(() => {
+    //for user
     const userRef = ref(db, "users");
     onValue(userRef, (snapshot) => {
       const userData = [];
@@ -53,233 +57,79 @@ function Payment() {
       });
       setUserData(userData);
     });
+
+    //for report-type
+    const repTypeRef = ref(db, "reportTypes");
+    onValue(repTypeRef, (snapshot) => {
+      const repTypeData = [];
+      snapshot.forEach((childSnapshot) => {
+        const repType = childSnapshot.val();
+        repTypeData.push(repType);
+      });
+      setRepTypeData(repTypeData);
+    });
   }, []);
-
-  // user update function
-  const updateUserData = () => {
-    const userRef = ref(db, `users/${selectedUser.uid}`);
-    const updates = {
-      userName: selectedUser.userName,
-      telephone: selectedUser.telephone,
-      address: selectedUser.address,
-      district: selectedUser.district,
-    };
-
-    // Update the data in Firebase realtime
-    update(userRef, updates)
-      .then(() => {
-        // Data updated successfully
-        console.log("User data updated!");
-        setShowEditModal(false); // Close the Edit modal
-        setShowUserUpdateSuccessModal(true);
-      })
-      .catch((error) => {
-        console.error("Error updating User data:", error);
-        setShowUserUpdateUnsuccessModal(true);
-      });
-  };
-
-  //Function to hadle remove button
-  const handleRemoveClick = (user) => {
-    const userRef = ref(db, "users/" + user.uid);
-    const imagePath = user.proPic;
-    const imageRef = storageRef(storage, imagePath);
-
-    // Remove the user's profile picture from Firebase Storage
-    deleteObject(imageRef)
-      .then(() => {
-        // Image deleted successfully from Firebase Storage
-        console.log(user.userName, "'s proPic deleted from Firebase Storage");
-      })
-      .catch((error) => {
-        console.error("Error deleting proPic from Firebase Storage:", error);
-      });
-
-    // Remove the user from Firebase database
-    remove(userRef)
-      .then(() => {
-        setShowUserRemoveSuccessModal(true);
-      })
-      .catch((error) => {
-        console.error("Error removing user:", error);
-        setShowUserRemoveUnsuccessModal(true);
-      });
-  };
-
-  //Function to handle view button
-  const handleViewClick = (user) => {
-    setSelectedUser(user);
-    setShowViewModal(true);
-  };
-
-  // Function to handle edit button
-  const handleEditClick = (user) => {
-    setSelectedUser(user);
-    setShowEditModal(true);
-  };
-
-  // Function to handle block/unblock button
-  const handleToggleBlock = (user) => {
-    //setShowClickAgainModal(true);
-    const userRef = ref(db, `users/${user.uid}`);
-    // Update the blocked status of the user in Firebase
-    const updatedBlockedStatus = !user.blocked;
-    const updates = {
-      blocked: updatedBlockedStatus,
-    };
-
-    // Update the data in Firebase
-    update(userRef, updates)
-      .then(() => {
-        // Data updated successfully
-        console.log(
-          "User statues:",
-          user.userName,
-          updatedBlockedStatus ? "Blocked" : "Unblocked"
-        );
-        //showing blocked modal success or not
-        updatedBlockedStatus
-          ? setShowUserBlockedModal(true)
-          : setShowUserUnblockedModal(true);
-      })
-      .catch((error) => {
-        console.error("Error blocking user:", error);
-      });
-  };
-
-  const columnHelper = createColumnHelper();
-
-  const columns = [
-    columnHelper.accessor("", {
-      id: "P.No",
-      cell: (info) => <span>{info.row.index + 1}</span>,
-      header: "P.No",
-    }),
-    columnHelper.accessor("userName", {
-      cell: (info) => <span>{info.getValue()}</span>,
-      header: "Name",
-    }),
-    columnHelper.accessor("method", {
-      cell: (info) => <span>{info.getValue()}</span>,
-      header: "Payment method",
-    }),
-    columnHelper.accessor("date", {
-      cell: (info) => <span>{info.getValue()}</span>,
-      header: "Payment date",
-    }),
-    columnHelper.accessor("time", {
-      cell: (info) => <span>{info.getValue()}</span>,
-      header: "Payment time",
-    }),
-    columnHelper.accessor("", {
-      header: "Action",
-      cell: (info) => (
-        <div className="flex items-center">
-          <button
-            className="bg-white text-blue border active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-            onClick={() => handleEditClick(info.row.original)}
-          >
-            Send a mail
-          </button>
-          <button
-            className="bg-blue text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-            onClick={() => handleViewClick(info.row.original)}
-          >
-            View User
-          </button>
-        </div>
-      ),
-    }),
-  ];
-  const [data] = useState(() => [...userData]);
-  const [globalFilter, setGlobalFilter] = useState("");
-
-  const table = useReactTable({
-    data: userData,
-    columns,
-    state: {
-      globalFilter,
-    },
-    getFilteredRowModel: getFilteredRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  });
 
   return (
     <>
       <div className="flex flex-col w-full h-full">
-        <div className="flex items-center w-full h-1/6 border-b border-ternary-blue dark:border-dark-ternary">
-          <div className="flex justify-start items-center h-full w-1/2 p-3">
-            <DebouncedInput
-              value={globalFilter ?? ""}
-              onChange={(value) => setGlobalFilter(String(value))}
-              placeholder="Search all columns..."
-            />
-          </div>
-          <div className="flex items-center justify-end h-full w-1/2 p-3">
-            <DownloadBtn data={userData} fileName={"users"} />
-            <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-center w-full h-4/6 max-h-[450px] overflow-y-auto p-3 rounded">
-          <UserPaymentTable tableName={table} />
-        </div>
-        <div className="flex items-center justify-center w-full h-1/6 p-3 border-t border-ternary-blue dark:border-dark-ternary">
-          {/* pagination */}
-          <div className="flex items-center justify-end mt-2 gap-2 text-ternary-blue dark:text-gray2">
-            <button
-              onClick={() => {
-                table.previousPage();
-              }}
-              disabled={!table.getCanPreviousPage()}
-              className="p-1 border border-gray-300 px-2 disabled:opacity-30"
-            >
-              {"<"}
-            </button>
-            <button
-              onClick={() => {
-                table.nextPage();
-              }}
-              disabled={!table.getCanNextPage()}
-              className="p-1 border border-gray-300 px-2 disabled:opacity-30"
-            >
-              {">"}
-            </button>
-
-            <span className="flex items-center gap-1">
-              <div>Page</div>
-              <strong>
-                {table.getState().pagination.pageIndex + 1} of{" "}
-                {table.getPageCount()}
-              </strong>
-            </span>
-            <span className="flex items-center gap-1">
-              | Go to page:
-              <input
-                type="number"
-                defaultValue={table.getState().pagination.pageIndex + 1}
-                onChange={(e) => {
-                  const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                  table.setPageIndex(page);
-                }}
-                className="border p-1 rounded w-16 bg-transparent"
-              />
-            </span>
-            <select
-              value={table.getState().pagination.pageSize}
-              onChange={(e) => {
-                table.setPageSize(Number(e.target.value));
-              }}
-              className="p-2 bg-transparent"
-            >
-              {[10, 20, 30, 50].map((pageSize) => (
-                <option key={pageSize} value={pageSize}>
-                  Show {pageSize}
-                </option>
-              ))}
-            </select>
+        <div className="flex items-center w-full h-1/6 border-b p-3 border-ternary-blue dark:border-dark-ternary">
+          <div className="flex h-full w-full">
+            <div className="flex h-full w-1/2">
+              <div className="flex items-center justify-center p-2 font-inter font-medium h-full w-1/3 text-ternary-blue dark:text-gray2">
+                Report type
+              </div>
+              <div className="h-full w-2/3">
+                <div className="h-full w-full p-2">
+                  <select
+                    className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                    value={reportType}
+                    onChange={(e) => {
+                      setReportType(e.target.value);
+                    }}
+                  >
+                    {repTypeData.map((typeName, index) => (
+                      <option
+                        className="text-primary-blue dark:text-gray1"
+                        key={index}
+                        value={typeName.typeName}
+                      >
+                        {typeName.typeName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="flex h-full w-1/2">
+              <div className="flex items-center justify-center p-2 font-inter font-medium h-full w-1/3 text-ternary-blue dark:text-gray2">
+                Username
+              </div>
+              <div className="h-full w-2/3">
+                <div className="h-full w-full p-2">
+                  <select
+                    className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                    value={userName}
+                    onChange={(e) => {
+                      setUserName(e.target.value);
+                    }}
+                  >
+                    {userData.map((userName, index) => (
+                      <option
+                        className="text-primary-blue dark:text-gray1"
+                        key={index}
+                        value={userName.userName}
+                      >
+                        {userName.userName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        <div className="flex items-center justify-center w-full h-5/6 max-h-[450px] overflow-y-auto p-3 rounded"></div>
       </div>
       {/**Edit modal */}
       {showEditModal ? (
