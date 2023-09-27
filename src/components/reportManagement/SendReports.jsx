@@ -10,8 +10,8 @@ function Payment() {
   const [showInitiatingModal, setShowInitiatingModal] = useState(false);
   const [userData, setUserData] = useState([]);
   const [repTypeData, setRepTypeData] = useState([]);
-  const [reportType, setReportType] = useState("");
-  const [userName, setUserName] = useState("");
+  const [reportType, setReportType] = useState(null);
+  const [userName, setUserName] = useState(null);
 
   // useEffect hook to fetch data from Firebase
   useEffect(() => {
@@ -57,7 +57,12 @@ function Payment() {
                     className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                     value={reportType}
                     onChange={(e) => {
-                      setReportType(e.target.value);
+                      const selectedValue = e.target.value;
+                      setReportType(
+                        selectedValue === "Select the Report type"
+                          ? null
+                          : selectedValue
+                      );
                     }}
                   >
                     <option className="text-primary-blue dark:text-gray1">
@@ -86,7 +91,12 @@ function Payment() {
                     className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                     value={userName}
                     onChange={(e) => {
-                      setUserName(e.target.value);
+                      const selectedValue = e.target.value;
+                      setUserName(
+                        selectedValue === "Select the User"
+                          ? null
+                          : selectedValue
+                      );
                     }}
                   >
                     <option className="text-primary-blue dark:text-gray1">
@@ -111,7 +121,7 @@ function Payment() {
           <div className="flex w-full h-2/5">
             <div className="h-full w-1/2">
               {repTypeData.map((repType, index) =>
-                repType.typeName === reportType ? (
+                repType.typeName === reportType && userName ? (
                   <div
                     className="w-full h-full p-1 text-ternary-blue dark:text-gray1"
                     key={index}
@@ -170,7 +180,7 @@ function Payment() {
             </div>
             <div className="h-full w-1/2">
               {repTypeData.map((repType, index) =>
-                repType.typeName === reportType ? (
+                repType.typeName === reportType && userName ? (
                   <div
                     className="w-full h-full p-1 text-ternary-blue dark:text-gray1"
                     key={index}
@@ -229,7 +239,7 @@ function Payment() {
             </div>
           </div>
           <div className="w-full h-3/5 p-1">
-            {reportType ? (
+            {reportType && userName ? (
               <div className="h-full w-full">
                 <div className="w-full h-3/4 pt-2 pb-2">
                   <textarea
@@ -245,7 +255,11 @@ function Payment() {
                   </div>
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <div className="flex justify-center h-full w-full text-ternary-blue dark:text-gray1">
+                Select a Report type and a User to send a report
+              </div>
+            )}
           </div>
         </div>
       </div>
