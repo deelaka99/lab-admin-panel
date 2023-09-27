@@ -3,47 +3,15 @@ import { db, storage } from "../../firebase";
 import { update, remove, ref, onValue } from "firebase/database";
 import { ref as storageRef, deleteObject } from "firebase/storage";
 import NotificationModal from "../Modal/NotificationModal";
-import {
-  createColumnHelper,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
-import UserPaymentTable from "../tables/UserPaymentTable";
-import DownloadBtn from "../tables/sampleTable/DownloadBtn";
-import DebouncedInput from "../tables/sampleTable/DebouncedInput";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFloppyDisk,
-  faPhoneVolume,
-  faLocationDot,
-  faEnvelope,
-  faRuler,
-  faWeightScale,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 function Payment() {
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showViewModal, setShowViewModal] = useState(false);
+  const [showInitiatingModal, setShowInitiatingModal] = useState(false);
   const [userData, setUserData] = useState([]);
   const [repTypeData, setRepTypeData] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [reportType, setReportType] = useState("");
   const [userName, setUserName] = useState("");
-
-  const [showUserUpdateSuccessModal, setShowUserUpdateSuccessModal] =
-    useState(false);
-  const [showUserUpdateUnsuccessModal, setShowUserUpdateUnsuccessModal] =
-    useState(false);
-  const [showUserRemoveSuccessModal, setShowUserRemoveSuccessModal] =
-    useState(false);
-  const [showUserRemoveUnsuccessModal, setShowUserRemoveUnsuccessModal] =
-    useState(false);
-  const [showUserBlockedModal, setShowUserBlockedModal] = useState(false);
-  const [showUserUnblockedModal, setShowUserUnblockedModal] = useState(false);
 
   // useEffect hook to fetch data from Firebase
   useEffect(() => {
@@ -70,6 +38,10 @@ function Payment() {
     });
   }, []);
 
+  const handleNextBtn = () => {
+    setShowInitiatingModal(false);
+  };
+
   return (
     <>
       <div className="flex flex-col w-full h-full">
@@ -88,13 +60,16 @@ function Payment() {
                       setReportType(e.target.value);
                     }}
                   >
-                    {repTypeData.map((typeName, index) => (
+                    <option className="text-primary-blue dark:text-gray1">
+                      Select the Report type
+                    </option>
+                    {repTypeData.map((repType, index) => (
                       <option
                         className="text-primary-blue dark:text-gray1"
                         key={index}
-                        value={typeName.typeName}
+                        value={repType.typeName}
                       >
-                        {typeName.typeName}
+                        {repType.typeName}
                       </option>
                     ))}
                   </select>
@@ -114,6 +89,9 @@ function Payment() {
                       setUserName(e.target.value);
                     }}
                   >
+                    <option className="text-primary-blue dark:text-gray1">
+                      Select the User
+                    </option>
                     {userData.map((userName, index) => (
                       <option
                         className="text-primary-blue dark:text-gray1"
@@ -129,10 +107,150 @@ function Payment() {
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-center w-full h-5/6 max-h-[450px] overflow-y-auto p-3 rounded"></div>
+        <div className="w-full h-5/6 max-h-[450px] overflow-y-auto p-3 rounded">
+          <div className="flex w-full h-2/5">
+            <div className="h-full w-1/2">
+              {repTypeData.map((repType, index) =>
+                repType.typeName === reportType ? (
+                  <div
+                    className="w-full h-full p-1 text-ternary-blue dark:text-gray1"
+                    key={index}
+                  >
+                    {/* metric 1 */}
+                    <div className="flex w-full h-1/2">
+                      {repType.metric1 ? (
+                        <>
+                          <div className="flex items-center justify-left h-full w-1/3">
+                            <p className="font-semibold">{repType.metric1}</p>
+                          </div>
+                          <div className="flex items-center justify-center h-full w-2/3">
+                            <input
+                              type={`${repType.metricVal1}`}
+                              placeholder={`Enter the ${repType.metric1}`}
+                              className="bg-ternary-blue bg-opacity-30 p-2 h-3/5 w-full border-white dark:border-gray2 dark:bg-dark-ternary rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                              // value={selectedReportType.metricVal2}
+                              // onChange={(e) =>
+                              //   setSelectedReportType({
+                              //     ...selectedReportType,
+                              //     metricVal2: e.target.value,
+                              //   })
+                              // }
+                            />
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                    {/* metric 3 */}
+                    <div className="flex w-full h-1/2">
+                      {repType.metric3 ? (
+                        <>
+                          <div className="flex items-center justify-left h-full w-1/3">
+                            <p className="font-semibold">{repType.metric3}</p>
+                          </div>
+                          <div className="flex items-center justify-center h-full w-2/3">
+                            <input
+                              type={`${repType.metricVal3}`}
+                              placeholder={`Enter the ${repType.metric3}`}
+                              className="bg-ternary-blue bg-opacity-30 p-2 h-3/5 w-full border-white dark:border-gray2 dark:bg-dark-ternary rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                              // value={selectedReportType.metricVal2}
+                              // onChange={(e) =>
+                              //   setSelectedReportType({
+                              //     ...selectedReportType,
+                              //     metricVal2: e.target.value,
+                              //   })
+                              // }
+                            />
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null
+              )}
+            </div>
+            <div className="h-full w-1/2">
+              {repTypeData.map((repType, index) =>
+                repType.typeName === reportType ? (
+                  <div
+                    className="w-full h-full p-1 text-ternary-blue dark:text-gray1"
+                    key={index}
+                  >
+                    {/* metric 2 */}
+                    <div className="flex w-full h-1/2">
+                      {repType.metric2 ? (
+                        <>
+                          <div className="flex items-center justify-left h-full w-1/3">
+                            <p className="font-semibold">{repType.metric2}</p>
+                          </div>
+                          <div className="flex items-center justify-center h-full w-2/3">
+                            <input
+                              type={`${repType.metricVal2}`}
+                              placeholder={`Enter the ${repType.metric2}`}
+                              className="bg-ternary-blue bg-opacity-30 p-2 h-3/5 w-full border-white dark:border-gray2 dark:bg-dark-ternary rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                              // value={selectedReportType.metricVal2}
+                              // onChange={(e) =>
+                              //   setSelectedReportType({
+                              //     ...selectedReportType,
+                              //     metricVal2: e.target.value,
+                              //   })
+                              // }
+                            />
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                    {/* metric 4 */}
+                    <div className="flex w-full h-1/2">
+                      {repType.metric4 ? (
+                        <>
+                          <div className="flex items-center justify-left h-full w-1/3">
+                            <p className="font-semibold">{repType.metric4}</p>
+                          </div>
+                          <div className="flex items-center justify-center h-full w-2/3">
+                            <input
+                              type={`${repType.metricVal4}`}
+                              placeholder={`Enter the ${repType.metric4}`}
+                              className="bg-ternary-blue bg-opacity-30 p-2 h-3/5 w-full border-white dark:border-gray2 dark:bg-dark-ternary rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                              // value={selectedReportType.metricVal2}
+                              // onChange={(e) =>
+                              //   setSelectedReportType({
+                              //     ...selectedReportType,
+                              //     metricVal2: e.target.value,
+                              //   })
+                              // }
+                            />
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null
+              )}
+            </div>
+          </div>
+          <div className="w-full h-3/5 p-1">
+            {reportType ? (
+              <div className="h-full w-full">
+                <div className="w-full h-3/4 pt-2 pb-2">
+                  <textarea
+                    placeholder="Add Notes..."
+                    className="h-full w-full rounded p-2 bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                  ></textarea>
+                </div>
+                <div className="flex items-center justify-end w-full h-1/4">
+                  <div className="h-full w-auto p-1 flex items-center justify-center">
+                    <button className="p-2 bg-secondary-blue hover:opacity-90 dark:bg-dark-ternary h-full w-full rounded-md text-xl shadow-xl text-white">
+                      Send Reports
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
       </div>
-      {/**Edit modal */}
-      {showEditModal ? (
+      {/**initiating modal */}
+      {showInitiatingModal ? (
         <div>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
@@ -140,10 +258,10 @@ function Payment() {
               <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
                 {/*header*/}
                 <div className="flex items-start justify-between p-1 rounded-t">
-                  <h3 className="text-xl font-semibold">Edit Lab</h3>
+                  <h3 className="text-xl font-semibold">Send Reports</h3>
                   <button
                     className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
-                    onClick={() => setShowEditModal(false)}
+                    onClick={() => setShowInitiatingModal(false)}
                   >
                     <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-3xl block dark:text-white flex items-center justify-center">
                       ×
@@ -151,82 +269,54 @@ function Payment() {
                   </button>
                 </div>
                 {/*body*/}
-                <div className="relative p-2 flex flex-col">
+                <div className="relative p-2">
                   <form>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div className="">
-                        <p className="font-semibold">User Name :</p>
+                    <div className="h-1/2 w-full flex items-center">
+                      <div className="flex items-center justify-left h-full w-1/2">
+                        <p className="font-semibold">Select User :</p>
                       </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new Lab name"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.userName}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              userName: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div>
-                        <p className="font-semibold">Address :</p>
-                      </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new Address"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.address}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              address: e.target.value,
-                            })
-                          }
-                        />
+                      <div className="h-full w-1/2 p-1">
+                        <select
+                          className="bg-primary-blue bg-opacity-30 border-primary-blue dark:border-gray2 dark:bg-dark-ternary w-full h-full rounded-full text-primary-blue dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                          value={userName}
+                          onChange={(e) => {
+                            setUserName(e.target.value);
+                          }}
+                        >
+                          {userData.map((userName, index) => (
+                            <option
+                              className="text-primary-blue dark:text-gray1"
+                              key={index}
+                              value={userName.userName}
+                            >
+                              {userName.userName}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div>
-                        <p className="font-semibold">District :</p>
+                    <div className="h-1/2 w-full flex items-center">
+                      <div className="flex items-center justify-left h-full w-1/2">
+                        <p className="font-semibold">Select Report type :</p>
                       </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new E-mail"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.district}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              district: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div>
-                        <p className="font-semibold">Telephone :</p>
-                      </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new Telephone"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.telephone}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              telephone: e.target.value,
-                            })
-                          }
-                        />
+                      <div className="h-full w-1/2 p-1">
+                        <select
+                          className="bg-primary-blue bg-opacity-30 border-primary-blue dark:border-gray2 dark:bg-dark-ternary w-full h-full rounded-full text-primary-blue dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                          value={reportType}
+                          onChange={(e) => {
+                            setUserName(e.target.value);
+                          }}
+                        >
+                          {repTypeData.map((typeName, index) => (
+                            <option
+                              className="text-primary-blue dark:text-gray1"
+                              key={index}
+                              value={typeName.typeName}
+                            >
+                              {typeName.typeName}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   </form>
@@ -236,10 +326,10 @@ function Payment() {
                   <button
                     className="bg-primary-blue text-white active:bg-black font-bold uppercase text-md px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:bg-dark-primary"
                     type="button"
-                    onClick={updateUserData}
+                    onClick={handleNextBtn}
                   >
-                    <FontAwesomeIcon icon={faFloppyDisk} />
-                    &nbsp; Save
+                    Next&nbsp;
+                    <FontAwesomeIcon icon={faChevronRight} />
                   </button>
                 </div>
               </div>
@@ -247,162 +337,6 @@ function Payment() {
           </div>
           <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
         </div>
-      ) : null}
-
-      {/**view modal */}
-      {showViewModal ? (
-        <div>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              {/*content*/}
-              <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
-                {/*header*/}
-                <div className="flex items-start justify-between p-1 rounded-t">
-                  <h3 className="text-xl font-semibold">User Info</h3>
-                  <button
-                    className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
-                    onClick={() => setShowViewModal(false)}
-                  >
-                    <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-3xl block dark:text-white flex items-center justify-center">
-                      ×
-                    </span>
-                  </button>
-                </div>
-                {/*body*/}
-                <div className="w-full h-full p-3">
-                  <div className="flex p-1">
-                    <div className="h-full w-1/2 p-2">
-                      <div className="flex items-center justify-center ">
-                        <img
-                          className="rounded-full border-4 border-white drop-shadow-lg w-1/2 h-1/2 object-cover"
-                          src={selectedUser.proPic}
-                          alt="proPic"
-                        />
-                      </div>
-                      <p className="h-1/2 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
-                        {selectedUser.userName}
-                      </p>
-                    </div>
-                    <div className="h-full w-1/2 p-2 font-inter">
-                      <div className="w-full h-1/2 text-sm">
-                        <p className="font-bold text-lg pb-3">
-                          Contact Details:
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faPhoneVolume} />
-                          &nbsp;&nbsp;&nbsp;{selectedUser.telephone}
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faEnvelope} />
-                          &nbsp;&nbsp;&nbsp;{selectedUser.email}
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faLocationDot} />
-                          &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
-                          {selectedUser.district},&nbsp;{selectedUser.province}{" "}
-                          province,&nbsp;Sri Lanka.
-                        </p>
-                      </div>
-                      <p>&nbsp;</p>
-                      <div className="w-full h-1/2 text-sm">
-                        <p className="font-bold text-lg pb-3">
-                          Biometric Details:
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faRuler} />
-                          &nbsp;&nbsp;&nbsp;100cm
-                        </p>
-                        <p className="h-full w-full">
-                          <FontAwesomeIcon icon={faWeightScale} />
-                          &nbsp;&nbsp;&nbsp;10Kg
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
-        </div>
-      ) : null}
-
-      {/**User update success modal */}
-      {showUserUpdateSuccessModal ? (
-        <NotificationModal
-          show={showUserUpdateSuccessModal}
-          onClose={() => {
-            setShowUserUpdateSuccessModal(false);
-          }}
-          title="Notification"
-          body="User Updated Successfull! 😎"
-          color="green"
-        />
-      ) : null}
-
-      {/**User update Unsuccess modal */}
-      {showUserUpdateSuccessModal ? (
-        <NotificationModal
-          show={showUserUpdateUnsuccessModal}
-          onClose={() => {
-            setShowUserUpdateUnsuccessModal(false);
-          }}
-          title="Notification"
-          body="User Updated Unsuccessfull! 😥"
-          color="red"
-        />
-      ) : null}
-
-      {/**User remove success modal */}
-      {showUserRemoveSuccessModal ? (
-        <NotificationModal
-          show={showUserRemoveSuccessModal}
-          onClose={() => {
-            setShowUserRemoveSuccessModal(false);
-          }}
-          title="Notification"
-          body="User Removed! 🤔"
-          color="red"
-        />
-      ) : null}
-
-      {/**User remove unsuccess modal */}
-      {showUserRemoveUnsuccessModal ? (
-        <NotificationModal
-          show={showUserRemoveUnsuccessModal}
-          onClose={() => {
-            setShowUserRemoveUnsuccessModal(false);
-          }}
-          title="Notification"
-          body="User Removal Unsuccessfull! 🤗"
-          color="red"
-        />
-      ) : null}
-
-      {/**User blocked success modal */}
-      {showUserBlockedModal ? (
-        <NotificationModal
-          show={showUserBlockedModal}
-          onClose={() => {
-            setShowUserBlockedModal(false);
-          }}
-          title="Notification"
-          body="User Blocked! 🤔"
-          color="yellow"
-        />
-      ) : null}
-
-      {/**User unblocked success modal */}
-      {showUserUnblockedModal ? (
-        <NotificationModal
-          show={showUserUnblockedModal}
-          onClose={() => {
-            setShowUserUnblockedModal(false);
-          }}
-          title="Notification"
-          body="User UnBlocked! 🤗"
-          color="green"
-        />
       ) : null}
     </>
   );
