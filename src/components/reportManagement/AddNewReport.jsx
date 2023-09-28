@@ -16,10 +16,10 @@ function AddNewReport() {
   const [metric2, setMetric2] = useState("");
   const [metric3, setMetric3] = useState("");
   const [metric4, setMetric4] = useState("");
-  const [metricVal1, setMetricVal1] = useState("");
-  const [metricVal2, setMetricVal2] = useState("");
-  const [metricVal3, setMetricVal3] = useState("");
-  const [metricVal4, setMetricVal4] = useState("");
+  const [metricVal1, setMetricVal1] = useState("Text");
+  const [metricVal2, setMetricVal2] = useState("Text");
+  const [metricVal3, setMetricVal3] = useState("Text");
+  const [metricVal4, setMetricVal4] = useState("Text");
   const [reportIcon, setReportIcon] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFilePath, setSelectedFilePath] = useState(null);
@@ -275,16 +275,20 @@ function AddNewReport() {
                     </div>
                     <div className="flex items-center justify-center h-full w-4/6">
                       <div className="h-full w-full p-2">
-                        <input
-                          type="text"
-                          placeholder="Enter value type"
-                          className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
-                          w-full h-full rounded-full text-white dark:text-gray1 border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                        {/* Dropdown for Value type */}
+                        <select
                           value={metricVal1}
+                          placeholder="Enter value type"
                           onChange={(e) => {
                             setMetricVal1(e.target.value);
                           }}
-                        />
+                          className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
+                          w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                        >
+                          <option value="text">Text</option>
+                          <option value="number">Number</option>
+                          <option value="date">Date</option>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -320,16 +324,20 @@ function AddNewReport() {
                     </div>
                     <div className="flex items-center justify-center h-full w-4/6">
                       <div className="h-full w-full p-2">
-                        <input
-                          type="text"
-                          placeholder="Enter value type"
-                          className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
-                          w-full h-full rounded-full text-white dark:text-gray1 border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                        {/* Dropdown for Value type */}
+                        <select
                           value={metricVal2}
+                          placeholder="Enter value type"
                           onChange={(e) => {
                             setMetricVal2(e.target.value);
                           }}
-                        />
+                          className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
+                          w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                        >
+                          <option value="text">Text</option>
+                          <option value="number">Number</option>
+                          <option value="date">Date</option>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -365,16 +373,20 @@ function AddNewReport() {
                     </div>
                     <div className="flex items-center justify-center h-full w-4/6">
                       <div className="h-full w-full p-2">
-                        <input
-                          type="text"
-                          placeholder="Enter value type"
-                          className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
-                          w-full h-full rounded-full text-white dark:text-gray1 border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                        {/* Dropdown for Value type */}
+                        <select
                           value={metricVal3}
+                          placeholder="Enter value type"
                           onChange={(e) => {
                             setMetricVal3(e.target.value);
                           }}
-                        />
+                          className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
+                          w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                        >
+                          <option value="text">Text</option>
+                          <option value="number">Number</option>
+                          <option value="date">Date</option>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -410,16 +422,20 @@ function AddNewReport() {
                     </div>
                     <div className="flex items-center justify-center h-full w-4/6">
                       <div className="h-full w-full p-2">
-                        <input
-                          type="text"
-                          placeholder="Enter value type"
-                          className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
-                          w-full h-full rounded-full text-white dark:text-gray1 border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                        {/* Dropdown for Value type */}
+                        <select
                           value={metricVal4}
+                          placeholder="Enter value type"
                           onChange={(e) => {
                             setMetricVal4(e.target.value);
                           }}
-                        />
+                          className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
+                          w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
+                        >
+                          <option value="text">Text</option>
+                          <option value="number">Number</option>
+                          <option value="date">Date</option>
+                        </select>
                       </div>
                     </div>
                   </div>
