@@ -370,18 +370,22 @@ function ManageUsers() {
                           <p className="font-semibold">Metric 1 Value:</p>
                         </div>
                         <div className="pt-2 pb-2">
-                          <input
-                            type="text"
-                            placeholder="Enter new metric 1 value"
-                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                          {/* Dropdown for Value type */}
+                          <select
                             value={selectedReportType.metricVal1}
+                            placeholder="Enter new metric 1 value"
                             onChange={(e) =>
                               setSelectedReportType({
                                 ...selectedReportType,
                                 metricVal1: e.target.value,
                               })
                             }
-                          />
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                          >
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -410,18 +414,22 @@ function ManageUsers() {
                           <p className="font-semibold">Metric 2 Value:</p>
                         </div>
                         <div className="pt-2 pb-2">
-                          <input
-                            type="text"
-                            placeholder="Enter new metric 2 value"
-                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                          {/* Dropdown for Value type */}
+                          <select
                             value={selectedReportType.metricVal2}
+                            placeholder="Enter new metric 1 value"
                             onChange={(e) =>
                               setSelectedReportType({
                                 ...selectedReportType,
                                 metricVal2: e.target.value,
                               })
                             }
-                          />
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                          >
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -450,18 +458,22 @@ function ManageUsers() {
                           <p className="font-semibold">Metric 3 Value:</p>
                         </div>
                         <div className="pt-2 pb-2">
-                          <input
-                            type="text"
-                            placeholder="Enter new metric 3 value"
-                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                          {/* Dropdown for Value type */}
+                          <select
                             value={selectedReportType.metricVal3}
+                            placeholder="Enter new metric 1 value"
                             onChange={(e) =>
                               setSelectedReportType({
                                 ...selectedReportType,
                                 metricVal3: e.target.value,
                               })
                             }
-                          />
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                          >
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -490,18 +502,22 @@ function ManageUsers() {
                           <p className="font-semibold">Metric 4 Value:</p>
                         </div>
                         <div className="pt-2 pb-2">
-                          <input
-                            type="text"
-                            placeholder="Enter new metric 4 value"
-                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                          {/* Dropdown for Value type */}
+                          <select
                             value={selectedReportType.metricVal4}
+                            placeholder="Enter new metric 1 value"
                             onChange={(e) =>
                               setSelectedReportType({
                                 ...selectedReportType,
                                 metricVal4: e.target.value,
                               })
                             }
-                          />
+                            className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
+                          >
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                          </select>
                         </div>
                       </div>
                     </div>
