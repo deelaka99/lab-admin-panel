@@ -448,7 +448,8 @@ function ManageUsers() {
                   </button>
                 </div>
                 {/*body*/}
-                <div className="w-full h-full p-3">
+                <div className="bg-secondary-blue bg-opacity-25 dark:bg-dark-primary dark:bg-opacity-55  w-full h-full p-3">
+                  {/* upper part */}
                   <div className="flex p-1">
                     <div className="h-full w-1/2 p-2">
                       <div className="flex items-center justify-center ">

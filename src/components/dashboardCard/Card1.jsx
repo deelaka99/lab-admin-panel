@@ -1,7 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const Card = (props) => {
   const { color, title, count } = props;
+  const [initialCount, setInitialCount] = useState(1);
+
+  useEffect(() => {
+    const animationDuration = 1000; // 1 second
+    let startTime;
+
+    function animateCount(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsedTime = timestamp - startTime;
+
+      if (elapsedTime < animationDuration) {
+        const progress = elapsedTime / animationDuration;
+        setInitialCount(Math.min(count, Math.floor(progress * count)));
+        requestAnimationFrame(animateCount);
+      } else {
+        setInitialCount(count);
+      }
+    }
+
+    requestAnimationFrame(animateCount);
+
+    return () => {
+      startTime = null;
+    };
+  }, [count]);
 
   return (
     <div
@@ -19,7 +44,7 @@ const Card = (props) => {
         <h1 className="text-[13px] text-center">{title}</h1>
       </div>
       <div className="flex items-center justify-center h-3/5 w-full p-1">
-        <h1 className="text-[60px] font-semibold">{count}</h1>
+        <h1 className="text-[60px] font-semibold">{initialCount}</h1>
       </div>
       <div className="flex items-center justify-center h-1/5 w-full p-1"></div>
     </div>
@@ -27,3 +52,4 @@ const Card = (props) => {
 };
 
 export default Card;
+

@@ -19,6 +19,7 @@ function Dashboard() {
   const [blockedUserCount, setBlockedUserCount] = useState(0);
   const [activeUserCount, setActiveUserCount] = useState(0);
   const [repTypesCount, setRepTypesCount] = useState(0);
+  const [userReportsCount, setUserReportsCount] = useState(0);
 
   useEffect(() => {
     // Fetch registered users count
@@ -66,6 +67,23 @@ function Dashboard() {
         setLoading(false);
       }
     });
+
+    // Fetch user reports count
+    const userReportRef = ref(db, "userReports/");
+    onValue(userReportRef, (snapshot) => {
+      try {
+        setLoading(true);
+        if (snapshot.exists()) {
+          const userReportsData = snapshot.val();
+          const userReportsCount = Object.keys(userReportsData).length;
+          setUserReportsCount(userReportsCount);
+        }
+      } catch (error) {
+        console.log("Error in user reports fetching: ", error);
+      } finally {
+        setLoading(false);
+      }
+    });
   }, []);
 
   return (
@@ -79,12 +97,21 @@ function Dashboard() {
               </h1>
             </div>
             <div className="flex justify-center items-center w-full h-5/6 p-5">
-              <Card color={"blue"} title={"Report Types"} count={repTypesCount} />
+              <Card
+                color={"blue"}
+                title={"Report Types"}
+                count={repTypesCount}
+              />
+              <p>&nbsp;&nbsp;&nbsp;</p>
+              <Card
+                color={"blue"}
+                title={"Total Report Sent"}
+                count={userReportsCount}
+              />
               <p>&nbsp;&nbsp;&nbsp;</p>
               <Card color={"blue"} title={"Pending Reports"} count={"22"} />
               <p>&nbsp;&nbsp;&nbsp;</p>
-              <Card color={"blue"} title={"Total Report Sent"} count={"100"} />
-              <p>&nbsp;&nbsp;&nbsp;</p>
+
               <Card color={"blue"} title={"User Feedbacks"} count={"1800"} />
             </div>
           </div>
