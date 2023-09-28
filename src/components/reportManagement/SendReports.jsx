@@ -1,17 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { db, storage } from "../../firebase";
-import { update, remove, ref, onValue } from "firebase/database";
-import { ref as storageRef, deleteObject } from "firebase/storage";
-import NotificationModal from "../Modal/NotificationModal";
+import { db } from "../../firebase";
+import { set, ref, onValue } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 function Payment() {
-  const [showInitiatingModal, setShowInitiatingModal] = useState(false);
   const [userData, setUserData] = useState([]);
   const [repTypeData, setRepTypeData] = useState([]);
-  const [reportType, setReportType] = useState(null);
-  const [userName, setUserName] = useState(null);
+  const [reportType, setReportType] = useState("");
+  const [userName, setUserName] = useState("");
+
+  const [showAddedSuccessModal, setShowAddedSuccessModal] = useState(false);
+  const [showAddedUnsuccessModal, setShowAddedUnsuccessModal] = useState(false);
+
+  const [mVal1, setMVal1] = useState("");
+  const [mVal2, setMVal2] = useState("");
+  const [mVal3, setMVal3] = useState("");
+  const [mVal4, setMVal4] = useState("");
+  const [note, setNote] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  //error states
+  const [mVal1Error, setMVal1Error] = useState(null);
+  const [mVal2Error, setMVal2Error] = useState(null);
+  const [mVal3Error, setMVal3Error] = useState(null);
+  const [mVal4Error, setMVal4Error] = useState(null);
 
   // useEffect hook to fetch data from Firebase
   useEffect(() => {
@@ -38,8 +51,61 @@ function Payment() {
     });
   }, []);
 
-  const handleNextBtn = () => {
-    setShowInitiatingModal(false);
+  //write
+  const writeToDatabase = () => {
+    //validation checks
+    let isValid = true;
+    // Get the current date and time
+    const currentDate = new Date();
+    const currentDateString = currentDate.toISOString().split('T')[0]; // Get date as a string
+    const currentTimeString = currentDate.toTimeString().split(' ')[0]; // Get time as a string
+
+    if (!mVal1) {
+      setMVal1Error("Value_1 is required");
+      isValid = false;
+    }
+    if (!mVal2) {
+      setMVal2Error("Value_2 is required");
+      isValid = false;
+    }
+
+    if (!mVal3) {
+      setMVal3Error("Value_3 is required");
+      isValid = false;
+    }
+    if (!mVal4) {
+      setMVal4Error("Value_4 is required");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      setShowAddedUnsuccessModal(true);
+      return; //not proceed if there are validation errors
+    } else {
+      try {
+        setLoading(true); // Set loading state to true
+        // Writing data to the Firebase
+        const userReportData = {
+          reportType,
+          userName,
+          mVal1,
+          mVal2,
+          mVal3,
+          mVal4,
+          note,
+          Date: currentDateString,
+          time: currentTimeString
+        };
+
+        set(ref(db, `userReports/${userName}_${reportType}_${currentDateString}_${currentTimeString}`), userReportData);
+        setLoading(false);
+        setShowAddedSuccessModal(true);
+      } catch (error) {
+        setShowAddedUnsuccessModal(true);
+        console.log("Error sending reports to ", userName, ":", error);
+        setLoading(false);
+      }
+    }
   };
 
   return (
@@ -68,15 +134,17 @@ function Payment() {
                     <option className="text-primary-blue dark:text-gray1">
                       Select the Report type
                     </option>
-                    {repTypeData.map((repType, index) => (
-                      <option
-                        className="text-primary-blue dark:text-gray1"
-                        key={index}
-                        value={repType.typeName}
-                      >
-                        {repType.typeName}
-                      </option>
-                    ))}
+                    {repTypeData.map((repType, index) =>
+                      repType.activeStatus ? (
+                        <option
+                          className="text-primary-blue dark:text-gray1"
+                          key={index}
+                          value={repType.typeName}
+                        >
+                          {repType.typeName}
+                        </option>
+                      ) : null
+                    )}
                   </select>
                 </div>
               </div>
@@ -102,15 +170,17 @@ function Payment() {
                     <option className="text-primary-blue dark:text-gray1">
                       Select the User
                     </option>
-                    {userData.map((userName, index) => (
-                      <option
-                        className="text-primary-blue dark:text-gray1"
-                        key={index}
-                        value={userName.userName}
-                      >
-                        {userName.userName}
-                      </option>
-                    ))}
+                    {userData.map((userName, index) =>
+                      !userName.blocked ? (
+                        <option
+                          className="text-primary-blue dark:text-gray1"
+                          key={index}
+                          value={userName.userName}
+                        >
+                          {userName.userName}
+                        </option>
+                      ) : null
+                    )}
                   </select>
                 </div>
               </div>
@@ -137,18 +207,19 @@ function Payment() {
                             <input
                               type={`${repType.metricVal1}`}
                               placeholder={`Enter the ${repType.metric1}`}
-                              className="bg-ternary-blue bg-opacity-30 p-2 h-3/5 w-full border-white dark:border-gray2 dark:bg-dark-ternary rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
-                              // value={selectedReportType.metricVal2}
-                              // onChange={(e) =>
-                              //   setSelectedReportType({
-                              //     ...selectedReportType,
-                              //     metricVal2: e.target.value,
-                              //   })
-                              // }
+                              className={`${
+                                mVal1Error !== ""
+                                  ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
+                                  : "border-white bg-red-2 text-white"
+                              } w-full h-2/3 rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                              value={mVal1}
+                              onChange={(e) => setMVal1(e.target.value)}
                             />
                           </div>
                         </>
-                      ) : null}
+                      ) : (
+                        setMVal1("Zero")
+                      )}
                     </div>
                     {/* metric 3 */}
                     <div className="flex w-full h-1/2">
@@ -161,14 +232,13 @@ function Payment() {
                             <input
                               type={`${repType.metricVal3}`}
                               placeholder={`Enter the ${repType.metric3}`}
-                              className="bg-ternary-blue bg-opacity-30 p-2 h-3/5 w-full border-white dark:border-gray2 dark:bg-dark-ternary rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
-                              // value={selectedReportType.metricVal2}
-                              // onChange={(e) =>
-                              //   setSelectedReportType({
-                              //     ...selectedReportType,
-                              //     metricVal2: e.target.value,
-                              //   })
-                              // }
+                              className={`${
+                                mVal3Error !== ""
+                                  ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
+                                  : "border-white bg-red-2 text-white"
+                              } w-full h-2/3 rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                              value={mVal3}
+                              onChange={(e) => setMVal3(e.target.value)}
                             />
                           </div>
                         </>
@@ -196,14 +266,13 @@ function Payment() {
                             <input
                               type={`${repType.metricVal2}`}
                               placeholder={`Enter the ${repType.metric2}`}
-                              className="bg-ternary-blue bg-opacity-30 p-2 h-3/5 w-full border-white dark:border-gray2 dark:bg-dark-ternary rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
-                              // value={selectedReportType.metricVal2}
-                              // onChange={(e) =>
-                              //   setSelectedReportType({
-                              //     ...selectedReportType,
-                              //     metricVal2: e.target.value,
-                              //   })
-                              // }
+                              className={`${
+                                mVal2Error !== ""
+                                  ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
+                                  : "border-white bg-red-2 text-white"
+                              } w-full h-2/3 rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                              value={mVal2}
+                              onChange={(e) => setMVal2(e.target.value)}
                             />
                           </div>
                         </>
@@ -220,14 +289,13 @@ function Payment() {
                             <input
                               type={`${repType.metricVal4}`}
                               placeholder={`Enter the ${repType.metric4}`}
-                              className="bg-ternary-blue bg-opacity-30 p-2 h-3/5 w-full border-white dark:border-gray2 dark:bg-dark-ternary rounded-full text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
-                              // value={selectedReportType.metricVal2}
-                              // onChange={(e) =>
-                              //   setSelectedReportType({
-                              //     ...selectedReportType,
-                              //     metricVal2: e.target.value,
-                              //   })
-                              // }
+                              className={`${
+                                mVal4Error !== ""
+                                  ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
+                                  : "border-white bg-red-2 text-white"
+                              } w-full h-2/3 rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                              value={mVal4}
+                              onChange={(e) => setMVal4(e.target.value)}
                             />
                           </div>
                         </>
@@ -243,13 +311,18 @@ function Payment() {
               <div className="h-full w-full">
                 <div className="w-full h-3/4 pt-2 pb-2">
                   <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
                     placeholder="Add Notes..."
                     className="h-full w-full rounded p-2 bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary text-white dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                   ></textarea>
                 </div>
                 <div className="flex items-center justify-end w-full h-1/4">
                   <div className="h-full w-auto p-1 flex items-center justify-center">
-                    <button className="p-2 bg-secondary-blue hover:opacity-90 dark:bg-dark-ternary h-full w-full rounded-md text-xl shadow-xl text-white">
+                    <button
+                      onClick={writeToDatabase}
+                      className="p-2 bg-secondary-blue hover:opacity-90 dark:bg-dark-ternary h-full w-full rounded-md text-xl shadow-xl text-white"
+                    >
                       Send Reports
                     </button>
                   </div>
@@ -263,94 +336,100 @@ function Payment() {
           </div>
         </div>
       </div>
-      {/**initiating modal */}
-      {showInitiatingModal ? (
+
+      {/**Success notification modal */}
+      {showAddedSuccessModal ? (
         <div>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-white">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               {/*content*/}
-              <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
+              <div className="p-5 rounded-lg shadow-lg relative flex flex-col w-full bg-green border-2 outline-none focus:outline-none">
                 {/*header*/}
-                <div className="flex items-start justify-between p-1 rounded-t">
-                  <h3 className="text-xl font-semibold">Send Reports</h3>
+                <div className="flex items-start justify-between p-2 rounded-t">
+                  <h3 className="text-sm">Notification</h3>
                   <button
-                    className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
-                    onClick={() => setShowInitiatingModal(false)}
+                    className="ml-auto bg-red rounded-sm border-0 text-lg font-semibold drop-shadow-md active:bg-white"
+                    onClick={() => setShowAddedSuccessModal(false)}
                   >
-                    <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-3xl block dark:text-white flex items-center justify-center">
+                    <span className=" drop-shadow-lg shadow-black h-6 w-6 text-white flex items-center justify-center active:text-dark-ternary">
                       ×
                     </span>
                   </button>
                 </div>
                 {/*body*/}
-                <div className="relative p-2">
-                  <form>
-                    <div className="h-1/2 w-full flex items-center">
-                      <div className="flex items-center justify-left h-full w-1/2">
-                        <p className="font-semibold">Select User :</p>
-                      </div>
-                      <div className="h-full w-1/2 p-1">
-                        <select
-                          className="bg-primary-blue bg-opacity-30 border-primary-blue dark:border-gray2 dark:bg-dark-ternary w-full h-full rounded-full text-primary-blue dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
-                          value={userName}
-                          onChange={(e) => {
-                            setUserName(e.target.value);
-                          }}
-                        >
-                          {userData.map((userName, index) => (
-                            <option
-                              className="text-primary-blue dark:text-gray1"
-                              key={index}
-                              value={userName.userName}
-                            >
-                              {userName.userName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    <div className="h-1/2 w-full flex items-center">
-                      <div className="flex items-center justify-left h-full w-1/2">
-                        <p className="font-semibold">Select Report type :</p>
-                      </div>
-                      <div className="h-full w-1/2 p-1">
-                        <select
-                          className="bg-primary-blue bg-opacity-30 border-primary-blue dark:border-gray2 dark:bg-dark-ternary w-full h-full rounded-full text-primary-blue dark:text-gray1 border-2 pl-5 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
-                          value={reportType}
-                          onChange={(e) => {
-                            setUserName(e.target.value);
-                          }}
-                        >
-                          {repTypeData.map((typeName, index) => (
-                            <option
-                              className="text-primary-blue dark:text-gray1"
-                              key={index}
-                              value={typeName.typeName}
-                            >
-                              {typeName.typeName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </form>
+                <div className="relative p-6 flex flex-col">
+                  <h3 className="text-2xl font-semibold">
+                    Report send Successfull! 😎
+                  </h3>
                 </div>
                 {/*footer*/}
-                <div className="flex items-center justify-center p-1 rounded-b">
-                  <button
-                    className="bg-primary-blue text-white active:bg-black font-bold uppercase text-md px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:bg-dark-primary"
-                    type="button"
-                    onClick={handleNextBtn}
-                  >
-                    Next&nbsp;
-                    <FontAwesomeIcon icon={faChevronRight} />
-                  </button>
-                </div>
               </div>
             </div>
           </div>
           <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
         </div>
+      ) : null}
+
+      {/**Unsuccess notification modal */}
+      {showAddedUnsuccessModal ? (
+        <div>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-white">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="p-5 rounded-lg shadow-lg relative flex flex-col w-full bg-red border-2 outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-2 rounded-t">
+                  <h3 className="text-sm">Notification</h3>
+                  <button
+                    className="ml-auto bg-red-1 rounded-sm border-0 text-lg font-semibold drop-shadow-md active:bg-white"
+                    onClick={() => setShowAddedUnsuccessModal(false)}
+                  >
+                    <span className=" drop-shadow-lg shadow-black h-6 w-6 text-white flex items-center justify-center active:text-dark-ternary">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="relative p-6 flex flex-col">
+                  <h3 className="text-center text-2xl font-semibold">
+                    Report Send Unsuccessfull! 😢
+                  </h3>
+                  {mVal1Error && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {mVal1Error} -
+                    </p>
+                  )}
+                  {mVal2Error && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {mVal2Error} -
+                    </p>
+                  )}
+                  {mVal3Error && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {mVal3Error} -
+                    </p>
+                  )}
+                  {mVal4Error && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {mVal4Error} -
+                    </p>
+                  )}
+                </div>
+                {/*footer*/}
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </div>
+      ) : null}
+
+      {loading ? (
+        <>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
+            <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-primary-blue dark:border-white"></div>
+          </div>
+          <div className="opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </>
       ) : null}
     </>
   );
