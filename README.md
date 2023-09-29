@@ -1,8 +1,13 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Lab-Admin-Panel
 
-Currently, two official plugins are available:
+Created Using ReactJS with Tailwind CSS
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Main Project
+
+Laboratory Report Analyzing System
+
+
+## Figma Link
+[Figma Link](https://www.figma.com/file/japBwlqRJzUXl6XM3lQJap/Laboratory-Dashboard?type=design&node-id=0%3A1&mode=design&t=wkyTHeFT9MO7oV3u-1)
