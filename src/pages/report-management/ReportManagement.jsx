@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faFlagCheckered,
   faFileCirclePlus,
   faListCheck,
   faFileExport,
@@ -9,6 +10,7 @@ import {
 import AddNewReport from "../../components/reportManagement/AddNewReport";
 import ManageReports from "../../components/reportManagement/ManageReports";
 import SendReports from "../../components/reportManagement/SendReports";
+import UserReports from "../../components/reportManagement/UserReports";
 
 function ReportManagement() {
   const [activeComponent, setActiveComponent] = useState("AddNewReport");
@@ -31,7 +33,8 @@ function ReportManagement() {
               onClick={() => handleButtonClick("AddNewReport")}
             >
               <div className="h-full w-full p-3 flex items-center">
-                <FontAwesomeIcon icon={faFileCirclePlus} />&nbsp;Add New Report
+                <FontAwesomeIcon icon={faFileCirclePlus} />
+                &nbsp;Add New Report Type
               </div>
             </button>
             <button
@@ -43,19 +46,34 @@ function ReportManagement() {
               onClick={() => handleButtonClick("ManageReports")}
             >
               <div className="h-full w-full p-3 flex items-center">
-                <FontAwesomeIcon icon={faListCheck} />&nbsp;Manage Reports
+                <FontAwesomeIcon icon={faListCheck} />
+                &nbsp;Manage Report Types
               </div>
             </button>
             <button
               className={`${
-                activeComponent === "SendReports"
+                activeComponent === "SendReport"
                   ? "bg-primary-blue bg-opacity-25 border-2 border-primary-blue dark:text-primary-blue dark:bg-dark-secondary"
                   : "text-primary-blue hover:font-bold "
               } h-1/3 w-full font-semibold text-lg rounded-lg active:text-secondary-blue active:border-secondary-blue dark:active:text-secondary-blue`}
-              onClick={() => handleButtonClick("SendReports")}
+              onClick={() => handleButtonClick("SendReport")}
             >
               <div className="h-full w-full p-3 flex items-center">
-                <FontAwesomeIcon icon={faFileExport} />&nbsp;Send Reports
+                <FontAwesomeIcon icon={faFileExport} />
+                &nbsp;Send a Report
+              </div>
+            </button>
+            <button
+              className={`${
+                activeComponent === "SentReports"
+                  ? "bg-primary-blue bg-opacity-25 border-2 border-primary-blue dark:text-primary-blue dark:bg-dark-secondary"
+                  : "text-primary-blue hover:font-bold "
+              } h-1/3 w-full font-semibold text-lg rounded-lg active:text-secondary-blue active:border-secondary-blue dark:active:text-secondary-blue`}
+              onClick={() => handleButtonClick("SentReports")}
+            >
+              <div className="h-full w-full p-3 flex items-center">
+                <FontAwesomeIcon icon={faFlagCheckered} />
+                &nbsp;Sent Reports
               </div>
             </button>
           </div>
@@ -64,7 +82,8 @@ function ReportManagement() {
         <div className="h-full w-4/5 bg-primary-blue bg-opacity-70 rounded-br-xl rounded-tr-xl dark:bg-dark-primary flex justify-center items-center">
           {activeComponent === "AddNewReport" && <AddNewReport />}
           {activeComponent === "ManageReports" && <ManageReports />}
-          {activeComponent === "SendReports" && <SendReports />}
+          {activeComponent === "SendReport" && <SendReports />}
+          {activeComponent === "SentReports" && <UserReports />}
         </div>
       </div>
     </>
