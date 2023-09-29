@@ -16,11 +16,18 @@ import DownloadBtn from "../tables/sampleTable/DownloadBtn";
 import DebouncedInput from "../tables/sampleTable/DebouncedInput";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPhoneVolume,
+  faLocationDot,
+  faEnvelope,
+  faRuler,
+  faWeightScale,
+} from "@fortawesome/free-solid-svg-icons";
 
 function UserReports() {
-  const [reportData, setReportData] = useState([]); // State to store retrieved data
-  const [selectedReport, setSelectedReport] = useState(null);
+  const [userData, setUserData] = useState([]); 
+  const [reportData, setReportData] = useState([]); 
+  const [showViewModal, setShowViewModal] = useState(false);
 
   const [showReportRemoveSuccessModal, setShowReportRemoveSuccessModal] =
     useState(false);
@@ -29,6 +36,16 @@ function UserReports() {
 
   // useEffect hook to fetch data from Firebase
   useEffect(() => {
+    const userRef = ref(db, "users");
+    onValue(userRef, (snapshot) => {
+      const userData = [];
+      snapshot.forEach((childSnapshot) => {
+        const user = childSnapshot.val();
+        userData.push(user);
+      });
+      setUserData(userData);
+    });
+
     const reportRef = ref(db, "userReports");
     onValue(reportRef, (snapshot) => {
       const reportData = [];
@@ -39,6 +56,12 @@ function UserReports() {
       setReportData(reportData);
     });
   }, []);
+
+  //Function to handle view button
+  const handleViewClick = (user) => {
+    //setSelectedUser(user);
+    setShowViewModal(true);
+  };
 
   //Function to hadle remove button
   const handleRemoveClick = (report) => {
@@ -87,7 +110,13 @@ function UserReports() {
     columnHelper.accessor("", {
       header: "Action",
       cell: (info) => (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
+          <button
+            className="bg-blue text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            onClick={() => handleViewClick(info.row.original)}
+          >
+            View
+          </button>
           <button
             className="bg-red-2 text-white active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
             onClick={() => handleRemoveClick(info.row.original)}
@@ -187,6 +216,85 @@ function UserReports() {
           </div>
         </div>
       </div>
+
+      {/**view modal */}
+      {showViewModal ? (
+        <div>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-1 rounded-t">
+                  <h3 className="text-xl font-semibold">Report Info</h3>
+                  <button
+                    className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
+                    onClick={() => setShowViewModal(false)}
+                  >
+                    <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-3xl block dark:text-white flex items-center justify-center">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="bg-secondary-blue bg-opacity-25 dark:bg-dark-primary dark:bg-opacity-55  w-full h-full p-3">
+                  {/* upper part */}
+                  <div className="bg-green flex p-1">
+                    <div className="h-full w-1/2 p-2">
+                      <div className="bg-red flex items-center justify-center ">
+                        {/* <img
+                          className="rounded-full border-4 border-white drop-shadow-lg w-1/2 h-1/2 object-cover"
+                          src={selectedUser.proPic}
+                          alt="proPic"
+                        /> */}
+                      </div>
+                      <p className="h-1/2 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
+                        {/* {selectedUser.userName} */}
+                      </p>
+                    </div>
+                    <div className="h-full w-1/2 p-2 font-inter">
+                      <div className="w-full h-1/2 text-sm">
+                        <p className="font-bold text-lg pb-3">
+                          Contact Details:
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faPhoneVolume} />
+                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.telephone} */}
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faEnvelope} />
+                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.email} */}
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faLocationDot} />
+                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
+                          {selectedUser.district},&nbsp;{selectedUser.province}{" "}
+                          province,&nbsp;Sri Lanka. */}
+                        </p>
+                      </div>
+                      <p>&nbsp;</p>
+                      <div className="w-full h-1/2 text-sm">
+                        <p className="font-bold text-lg pb-3">
+                          Biometric Details:
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faRuler} />
+                          &nbsp;&nbsp;&nbsp;100cm
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faWeightScale} />
+                          &nbsp;&nbsp;&nbsp;10Kg
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </div>
+      ) : null}
 
       {/**Report-type remove success modal */}
       {showReportRemoveSuccessModal ? (
