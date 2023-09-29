@@ -285,9 +285,15 @@ function AddNewReport() {
                           className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
                           w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                         >
-                          <option value="text">Text</option>
-                          <option value="number">Number</option>
-                          <option value="date">Date</option>
+                          <option className="text-primary-blue" value="text">
+                            Text
+                          </option>
+                          <option className="text-primary-blue" value="number">
+                            Number
+                          </option>
+                          <option className="text-primary-blue" value="date">
+                            Date
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -334,9 +340,15 @@ function AddNewReport() {
                           className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
                           w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                         >
-                          <option value="text">Text</option>
-                          <option value="number">Number</option>
-                          <option value="date">Date</option>
+                          <option className="text-primary-blue" value="text">
+                            Text
+                          </option>
+                          <option className="text-primary-blue" value="number">
+                            Number
+                          </option>
+                          <option className="text-primary-blue" value="date">
+                            Date
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -383,9 +395,15 @@ function AddNewReport() {
                           className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
                           w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                         >
-                          <option value="text">Text</option>
-                          <option value="number">Number</option>
-                          <option value="date">Date</option>
+                          <option className="text-primary-blue" value="text">
+                            Text
+                          </option>
+                          <option className="text-primary-blue" value="number">
+                            Number
+                          </option>
+                          <option className="text-primary-blue" value="date">
+                            Date
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -432,9 +450,15 @@ function AddNewReport() {
                           className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
                           w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                         >
-                          <option value="text">Text</option>
-                          <option value="number">Number</option>
-                          <option value="date">Date</option>
+                          <option className="text-primary-blue" value="text">
+                            Text
+                          </option>
+                          <option className="text-primary-blue" value="number">
+                            Number
+                          </option>
+                          <option className="text-primary-blue" value="date">
+                            Date
+                          </option>
                         </select>
                       </div>
                     </div>
