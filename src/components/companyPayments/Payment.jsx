@@ -146,13 +146,13 @@ function Payment() {
                           className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
                           w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                         >
-                          <option className="text-primary-blue" value="text">
+                          <option className="text-primary-blue" value="American Express">
                             American Express
                           </option>
-                          <option className="text-primary-blue" value="number">
+                          <option className="text-primary-blue" value="Credit card">
                             Credit card
                           </option>
-                          <option className="text-primary-blue" value="date">
+                          <option className="text-primary-blue" value="Debit card">
                             Debit card
                           </option>
                         </select>
