@@ -8,7 +8,7 @@ import {
 
 import Notification from "./Notification";
 import Security from "./Security";
-import Help from "./Help";
+import LabProfile from "./LabProfile";
 
 function SettingContainer() {
   const [activeComponent, setActiveComponent] = useState("labProfile");
@@ -61,8 +61,8 @@ function SettingContainer() {
           </div>
           <div className="h-2/6 w-ful"></div>
         </div>
-        <div className="h-full w-3/4 bg-primary-blue bg-opacity-70 rounded-br-xl rounded-tr-xl dark:bg-dark-primary flex justify-center items-center">
-          {activeComponent === "labProfile" && <Help />}
+        <div className="h-full w-3/4 bg-primary-blue bg-opacity-70 rounded-br-xl rounded-tr-xl dark:bg-dark-primary dark:bg-opacity-70 flex justify-center items-center">
+          {activeComponent === "labProfile" && <LabProfile />}
           {activeComponent === "Notification" && <Notification />}
           {activeComponent === "Security" && <Security />}
         </div>
