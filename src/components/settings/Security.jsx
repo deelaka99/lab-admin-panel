@@ -249,7 +249,7 @@ function Security() {
                     className="p-1 ml-auto  border-0 text-primary-blue text-3xl font-semibold active:text-black"
                     onClick={() => setTFVShowModal(false)}
                   >
-                    <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-4xl block dark:text-white flex items-center justify-center">
+                    <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-4xl dark:text-white flex items-center justify-center">
                       ×
                     </span>
                   </button>
@@ -263,7 +263,7 @@ function Security() {
                       </div>
                       <div className="pt-2 pb-2 flex items-center justify-center">
                         <p className="font-inter font-bold">
-                          123wejith@gmail.com
+                          {auth.currentUser.email}
                         </p>
                       </div>
                     </div>
