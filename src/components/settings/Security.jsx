@@ -7,7 +7,7 @@ import {
   faCaretRight,
 } from "@fortawesome/free-solid-svg-icons";
 import Toggle from "./Toggle";
-import { auth } from "../../firebase";
+import { auth, logout } from "../../firebase";
 import {
   updatePassword,
   reauthenticateWithCredential,
@@ -19,7 +19,8 @@ function Security() {
   const [loading, setLoading] = useState(false);
   const [showChangePasswordModal, setChangePasswordShowModal] = useState(false);
   const [showTFVModal, setTFVShowModal] = useState(false);
-  const [showCurrentPwNotMatchModal, setShowCurrentPwNotMatchModal] = useState(false);
+  const [showCurrentPwNotMatchModal, setShowCurrentPwNotMatchModal] =
+    useState(false);
   const [showPwUpdateSuccessModal, setShowPwUpdateSuccessModal] =
     useState(false);
   const [showPwUpdateUnsuccessModal, setShowPwUpdateUnsuccessModal] =
@@ -27,6 +28,12 @@ function Security() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  //error states
+  const [pwMatchingError, setPwMatchingError] = useState(null);
+  const [lengthError, setLengthError] = useState(null);
+  const [newPwError, setNewPwError] = useState(null);
+  const [charError, setCharError] = useState(null);
 
   const handleChangePasswordClick = async () => {
     try {
@@ -40,23 +47,57 @@ function Security() {
         console.error("Error updating password:", error);
         setShowCurrentPwNotMatchModal(true);
       }
+      //password validation things
+      const hasUppercase = /[A-Z]/.test(newPassword);
+      const hasLowercase = /[a-z]/.test(newPassword);
+      const hasNumber = /\d/.test(newPassword);
+      const hasSpecialChar = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/\-="']/.test(
+        newPassword
+      );
+
       // Update the user's password
-      if (newPassword === confirmPassword) {
+      let isValid = true;
+
+      //password validations
+      if (!newPassword) {
+        setNewPwError("New Password is required");
+        isValid = false;
+      } else if (
+        !hasUppercase ||
+        !hasLowercase ||
+        !hasNumber ||
+        !hasSpecialChar
+      ) {
+        setCharError(
+          "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character!"
+        );
+        isValid = false;
+      } else if (newPassword.length < 8) {
+        setLengthError("Password is too short! [minimum characters: 8]");
+        isValid = false;
+      } else if (newPassword !== confirmPassword) {
+        setPwMatchingError("confirm and new passwrords are not matching!");
+        isValid = false;
+      }
+
+      if (isValid) {
         await updatePassword(user, newPassword);
         // Password updated successfully
         console.log("Password updated successfully");
         setChangePasswordShowModal(false);
         setShowPwUpdateSuccessModal(true);
+        // Delay the logout function call for 3 seconds
+        setTimeout(() => {
+          logout();
+        }, 3000); // 3000 milliseconds = 3 seconds
       } else {
-        console.log(
-          "Error updating password: confirm and new passwrords are not matching!"
-        );
+        // Password updated unsuccess
+        console.log("Password updated unsuccess");
         setChangePasswordShowModal(false);
         setShowPwUpdateUnsuccessModal(true);
       }
     } catch (error) {
       console.error("Error updating password:", error);
-      setPasswordsMatch(false);
     } finally {
       setLoading(false); // Set loading state to false
     }
@@ -268,15 +309,55 @@ function Security() {
 
       {/**Pw update Unsuccess */}
       {showPwUpdateUnsuccessModal ? (
-        <NotificationModal
-          show={showPwUpdateUnsuccessModal}
-          onClose={() => {
-            setShowPwUpdateUnsuccessModal(false);
-          }}
-          title="Notification"
-          body=" Not matching New and Confirm Passwords! 😥"
-          color="red"
-        />
+        <div>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-white">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="p-5 rounded-lg shadow-lg relative flex flex-col w-full bg-red border-2 outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-2 rounded-t">
+                  <h3 className="text-sm">Notification</h3>
+                  <button
+                    className="ml-auto bg-red-1 rounded-sm border-0 text-lg font-semibold drop-shadow-md active:bg-white"
+                    onClick={() => setShowPwUpdateUnsuccessModal(false)}
+                  >
+                    <span className=" drop-shadow-lg shadow-black h-6 w-6 text-white flex items-center justify-center active:text-dark-ternary">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="relative p-6 flex flex-col">
+                  <h3 className="text-center text-2xl font-semibold">
+                    Password not updated! 😢
+                  </h3>
+                  {pwMatchingError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {pwMatchingError} -
+                    </p>
+                  )}
+                  {lengthError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {lengthError} -
+                    </p>
+                  )}
+                  {newPwError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {newPwError} -
+                    </p>
+                  )}
+                  {charError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {charError} -
+                    </p>
+                  )}
+                </div>
+                {/*footer*/}
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </div>
       ) : null}
 
       {/**Current pw not matching */}
