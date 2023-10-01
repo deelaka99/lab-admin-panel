@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from "react";
 import { auth, db } from "../../firebase";
 import { set, ref, onValue } from "firebase/database";
-import CompanyLogo from "../../assets/images/company_logo.png"
+import CompanyLogo from "../../assets/images/company_logo.png";
 
 function Payment() {
   const currentDate = new Date();
@@ -14,8 +14,7 @@ function Payment() {
   const [showAddedUnsuccessModal, setShowAddedUnsuccessModal] = useState(false);
   //variable state
   const [operatorName, setOperatorName] = useState("");
-  const [labProPic, setLabProPic] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("American Express");
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [month, setMonth] = useState("");
   const [amount, setAmount] = useState(1500);
   const [loading, setLoading] = useState(false);
@@ -23,6 +22,8 @@ function Payment() {
   //error states
   const [operatorNameError, setOperatorNameError] = useState("");
   const [amountError, setAmountError] = useState("");
+  const [monthError, setMonthError] = useState("");
+  const [paymentMethodError, setPaymentMethodError] = useState("");
   const labUid = auth.currentUser.uid;
 
   useEffect(() => {
@@ -32,7 +33,6 @@ function Payment() {
         if (snapshot.exists()) {
           const labOpData = snapshot.val();
           setOperatorName(labOpData.LabName);
-          setLabProPic(labOpData.profilePicture)
         }
       });
 
@@ -58,6 +58,16 @@ function Payment() {
       isValid = false;
     }
 
+    if (!month) {
+      setMonthError("Payment month is required");
+      isValid = false;
+    }
+
+    if (!paymentMethod) {
+      setPaymentMethodError("Payment method is required");
+      isValid = false;
+    }
+
     if (!isValid) {
       setShowAddedUnsuccessModal(true);
       return; //not proceed if there are validation errors
@@ -69,7 +79,7 @@ function Payment() {
           operatorName,
           paymentDate: currentDateString,
           paymentTime: currentTimeString,
-          month:`${month}_${paymentYear}`,
+          month: `${month}_${paymentYear}`,
           paymentMethod,
           amount,
           labUid,
@@ -94,12 +104,20 @@ function Payment() {
               <div className="flex w-full h-full">
                 <div className="flex items-center justify-center h-full w-1/5 p-1">
                   <div className=" bg-primary-blue bg-opacity-70 border-2 shadow flex items-center justify-center h-full w-full rounded">
-                    <img src={CompanyLogo} alt="companyLogo" className="h-[90px] w-[90px]" />
+                    <img
+                      src={CompanyLogo}
+                      alt="companyLogo"
+                      className="h-[90px] w-[90px]"
+                    />
                   </div>
                 </div>
                 <div className="h-full w-4/5 p-3">
                   <div className="flex items-center justify-center rounded border-2 h-full w-full">
-                    <p className="font-inter text-2xl">{month?`You're going to pay for ${month} of ${paymentYear}!`:"Select Month to Pay!"}</p>
+                    <p className="font-inter text-2xl">
+                      {month
+                        ? `You're going to pay for ${month} of ${paymentYear}!`
+                        : "Select Month to Pay!"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -150,6 +168,7 @@ function Payment() {
                           className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
                           w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                         >
+                          <option>-Select Payment method-</option>
                           <option
                             className="text-primary-blue"
                             value="American Express"
@@ -185,7 +204,11 @@ function Payment() {
                       <div className="h-full w-full p-2">
                         {/* Dropdown for Value type */}
                         <select
-                          value={month}
+                          value={
+                            month === "-Select Payment month-"
+                              ? setMonth("")
+                              : month
+                          }
                           placeholder="Enter the payment method"
                           onChange={(e) => {
                             setMonth(e.target.value);
@@ -193,6 +216,7 @@ function Payment() {
                           className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
                           w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                         >
+                          <option>-Select Payment month-</option>
                           {Array.from({ length: 12 }, (_, i) => {
                             const monthIndex = i + 1; // Months are 1-based (January is 1)
                             return (
@@ -343,6 +367,16 @@ function Payment() {
                   {operatorNameError && (
                     <p className="h-1/6 pt-1 text-xs text-center text-white">
                       - {operatorNameError} -
+                    </p>
+                  )}
+                  {monthError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {monthError} -
+                    </p>
+                  )}
+                  {paymentMethodError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {paymentMethodError} -
                     </p>
                   )}
                 </div>
