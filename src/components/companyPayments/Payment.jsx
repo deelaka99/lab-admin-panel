@@ -1,6 +1,7 @@
 import { React, useEffect, useState } from "react";
 import { auth, db } from "../../firebase";
 import { set, ref, onValue } from "firebase/database";
+import CompanyLogo from "../../assets/images/company_logo.png"
 
 function Payment() {
   const currentDate = new Date();
@@ -13,6 +14,7 @@ function Payment() {
   const [showAddedUnsuccessModal, setShowAddedUnsuccessModal] = useState(false);
   //variable state
   const [operatorName, setOperatorName] = useState("");
+  const [labProPic, setLabProPic] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("American Express");
   const [month, setMonth] = useState("");
   const [amount, setAmount] = useState(1500);
@@ -30,6 +32,7 @@ function Payment() {
         if (snapshot.exists()) {
           const labOpData = snapshot.val();
           setOperatorName(labOpData.LabName);
+          setLabProPic(labOpData.profilePicture)
         }
       });
 
@@ -87,8 +90,19 @@ function Payment() {
         <div className="border-2 border-ternary-blue bg-primary-blue bg-opacity-50 dark:bg-dark-primary dark:border-dark-ternary h-5/6 w-11/12 rounded-xl flex flex-col">
           <div className="h-full w-full p-2 text-white">
             {/* row contaqiner 1 */}
-            <div className="bg-gradient-to-r from-primary-blue to-secondary-blue shadow border border-ternary-blue dark:border-gray2  rounded-lg w-full h-2/4">
-              <div className="flex w-full h-full"></div>
+            <div className="dark:bg-gradient-to-r dark:from-primary-blue dark:to-secondary-blue bg-gradient-to-r from-gray1 to-gray2 shadow border border-ternary-blue dark:border-gray2  rounded-lg w-full h-2/4 p-5">
+              <div className="flex w-full h-full">
+                <div className="flex items-center justify-center h-full w-1/5 p-1">
+                  <div className=" bg-primary-blue bg-opacity-70 border-2 shadow flex items-center justify-center h-full w-full rounded">
+                    <img src={CompanyLogo} alt="companyLogo" className="h-[90px] w-[90px]" />
+                  </div>
+                </div>
+                <div className="h-full w-4/5 p-3">
+                  <div className="flex items-center justify-center rounded border-2 h-full w-full">
+                    <p className="font-inter text-2xl">{month?`You're going to pay for ${month} of ${paymentYear}!`:"Select Month to Pay!"}</p>
+                  </div>
+                </div>
+              </div>
             </div>
             {/* row contaqiner 2 */}
             <div className="w-full h-1/4">
