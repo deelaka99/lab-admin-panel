@@ -1,22 +1,19 @@
 import { React, useEffect, useState } from "react";
 import { auth, db } from "../../firebase";
 import { set, ref, onValue } from "firebase/database";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 
 function Payment() {
   const currentDate = new Date();
   const currentDateString = currentDate.toISOString().split("T")[0]; // Get date as a string
   const currentTimeString = currentDate.toTimeString().split(" ")[0]; // Get time as a string
   const paymentTime = currentTimeString;
-  const paymentMonth = currentDate.getMonth();
   const paymentYear = currentDate.getFullYear();
 
   const [showAddedSuccessModal, setShowAddedSuccessModal] = useState(false);
   const [showAddedUnsuccessModal, setShowAddedUnsuccessModal] = useState(false);
   //variable state
   const [operatorName, setOperatorName] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("American Express");
   const [month, setMonth] = useState("");
   const [amount, setAmount] = useState(1500);
   const [loading, setLoading] = useState(false);
@@ -24,11 +21,11 @@ function Payment() {
   //error states
   const [operatorNameError, setOperatorNameError] = useState("");
   const [amountError, setAmountError] = useState("");
+  const labUid = auth.currentUser.uid;
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      const labOpRef = ref(db, `labs/${user.uid}`);
+    if (labUid) {
+      const labOpRef = ref(db, `labs/${labUid}`);
       const unsubscribe = onValue(labOpRef, (snapshot) => {
         if (snapshot.exists()) {
           const labOpData = snapshot.val();
@@ -65,22 +62,15 @@ function Payment() {
       //writting data to the firebase
       try {
         setLoading(true); // Set loading state to true
-        const currentLabOp = auth.currentUser.uid;
-        set(
-          ref(
-            db,
-            `labs/${currentLabOp}/companyPayments/${operatorName}_${paymentMonth}_${paymentYear}`
-          ),
-          {
-            operatorName,
-            paymentDate: currentDateString,
-            paymentTime: currentTimeString,
-            paymentMonth,
-            paymentYear,            
-            paymentMethod,
-            amount,
-          }
-        );
+        set(ref(db, `payments/labPayments/${labUid}/${month}_${paymentYear}`), {
+          operatorName,
+          paymentDate: currentDateString,
+          paymentTime: currentTimeString,
+          month:`${month}_${paymentYear}`,
+          paymentMethod,
+          amount,
+          labUid,
+        });
         setLoading(false);
         setShowAddedSuccessModal(true);
       } catch (error) {
@@ -146,13 +136,22 @@ function Payment() {
                           className="bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary
                           w-full h-full rounded-full text-white dark:text-gray1 border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1"
                         >
-                          <option className="text-primary-blue" value="American Express">
+                          <option
+                            className="text-primary-blue"
+                            value="American Express"
+                          >
                             American Express
                           </option>
-                          <option className="text-primary-blue" value="Credit card">
+                          <option
+                            className="text-primary-blue"
+                            value="Credit card"
+                          >
                             Credit card
                           </option>
-                          <option className="text-primary-blue" value="Debit card">
+                          <option
+                            className="text-primary-blue"
+                            value="Debit card"
+                          >
                             Debit card
                           </option>
                         </select>
@@ -185,7 +184,31 @@ function Payment() {
                             return (
                               <option
                                 key={monthIndex}
-                                value={String(monthIndex)}
+                                value={
+                                  monthIndex === 1
+                                    ? "January"
+                                    : monthIndex === 2
+                                    ? "February"
+                                    : monthIndex === 3
+                                    ? "March"
+                                    : monthIndex === 4
+                                    ? "April"
+                                    : monthIndex === 5
+                                    ? "May"
+                                    : monthIndex === 6
+                                    ? "June"
+                                    : monthIndex === 7
+                                    ? "July"
+                                    : monthIndex === 8
+                                    ? "Aughust"
+                                    : monthIndex === 9
+                                    ? "September"
+                                    : monthIndex === 10
+                                    ? "October"
+                                    : monthIndex === 11
+                                    ? "November"
+                                    : "December"
+                                }
                                 className="text-primary-blue"
                               >
                                 {new Date(
