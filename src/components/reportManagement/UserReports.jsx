@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { db, storage } from "../../firebase";
-import { update, remove, ref, onValue } from "firebase/database";
+import { db } from "../../firebase";
+import { remove, ref, onValue } from "firebase/database";
 import { ref as storageRef, deleteObject } from "firebase/storage";
 import NotificationModal from "../Modal/NotificationModal";
 import {
@@ -22,11 +22,28 @@ import {
   faEnvelope,
   faRuler,
   faWeightScale,
+  faDroplet,
 } from "@fortawesome/free-solid-svg-icons";
 
 function UserReports() {
-  const [userData, setUserData] = useState([]); 
-  const [reportData, setReportData] = useState([]); 
+  const [uid, setUid] = useState(null);
+  const [userName, setUserName] = useState("");
+  const [tele, setTele] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [userPropic, setUserPropic] = useState("");
+  const [district, setDistrict] = useState("");
+  const [province, setProvince] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [bday, setbday] = useState("1999-12-14");
+  const [age, setAge] = useState(0);
+  const [bloodGroup, setBloodGroup] = useState("A+");
+  const [userData, setUserData] = useState([]);
+  const [reportType, setReportType] = useState("");
+  const [reportSentDate, setReportSentDate] = useState("");
+  const [reportSentTime, setReportSentTime] = useState("");
+  const [reportData, setReportData] = useState([]);
   const [showViewModal, setShowViewModal] = useState(false);
 
   const [showReportRemoveSuccessModal, setShowReportRemoveSuccessModal] =
@@ -36,16 +53,7 @@ function UserReports() {
 
   // useEffect hook to fetch data from Firebase
   useEffect(() => {
-    const userRef = ref(db, "users");
-    onValue(userRef, (snapshot) => {
-      const userData = [];
-      snapshot.forEach((childSnapshot) => {
-        const user = childSnapshot.val();
-        userData.push(user);
-      });
-      setUserData(userData);
-    });
-
+    //for reports
     const reportRef = ref(db, "userReports");
     onValue(reportRef, (snapshot) => {
       const reportData = [];
@@ -55,12 +63,56 @@ function UserReports() {
       });
       setReportData(reportData);
     });
-  }, []);
+
+    //for user
+    const userRef = ref(db, `users`);
+    onValue(userRef, (snapshot) => {
+      const userData = [];
+      snapshot.forEach((childSnapshot) => {
+        const user = childSnapshot.val();
+        userData.push(user);
+      });
+      setUserData(userData);
+    });
+
+    if (uid) {
+      userData.forEach((user) => {
+        if (user.uid === uid) {
+          setUserName(user.userName);
+          setTele(user.telephone);
+          setEmail(user.email);
+          setAddress(user.address);
+          setUserPropic(user.proPic);
+          setDistrict(user.district);
+          setProvince(user.province);
+          setHeight(user.height);
+          setWeight(user.weight);
+          setBloodGroup(user.blood);
+          setbday(user.bday);
+        }
+      });
+      //calculating age
+      const today = new Date();
+      const birthDate = new Date(bday);
+      const ageDifference = today - birthDate; // Calculate the difference in milliseconds
+      const calculatedAge = Math.floor(
+        // Convert the difference to years
+        ageDifference / (365.25 * 24 * 60 * 60 * 1000)
+      );
+
+      setAge(calculatedAge);
+
+      setShowViewModal(true);
+      setUid(null);
+    }
+  }, [uid]);
 
   //Function to handle view button
-  const handleViewClick = (user) => {
-    //setSelectedUser(user);
-    setShowViewModal(true);
+  const handleViewClick = (report) => {
+    setUid(report.uid);
+    setReportType(report.reportType);
+    setReportSentDate(report.Date);
+    setReportSentTime(report.time);
   };
 
   //Function to hadle remove button
@@ -152,7 +204,7 @@ function UserReports() {
             />
           </div>
           <div className="flex items-center justify-end h-full w-1/2 p-3">
-            <DownloadBtn data={reportData} fileName={"reportTypes"} />
+            <DownloadBtn data={reportData} fileName={"UserReport"} />
             <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
           </div>
         </div>
@@ -239,17 +291,20 @@ function UserReports() {
                 {/*body*/}
                 <div className="bg-secondary-blue bg-opacity-25 dark:bg-dark-primary dark:bg-opacity-55  w-full h-full p-3">
                   {/* upper part */}
-                  <div className="bg-green flex p-1">
+                  <div className="flex p-1">
                     <div className="h-full w-1/2 p-2">
-                      <div className="bg-red flex items-center justify-center ">
-                        {/* <img
+                      <div className="flex items-center justify-center ">
+                        <img
                           className="rounded-full border-4 border-white drop-shadow-lg w-1/2 h-1/2 object-cover"
-                          src={selectedUser.proPic}
+                          src={userPropic}
                           alt="proPic"
-                        /> */}
+                        />
                       </div>
-                      <p className="h-1/2 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
-                        {/* {selectedUser.userName} */}
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
+                        {userName}
+                      </p>
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter text-sm">
+                        {age} years old
                       </p>
                     </div>
                     <div className="h-full w-1/2 p-2 font-inter">
@@ -259,17 +314,17 @@ function UserReports() {
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faPhoneVolume} />
-                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.telephone} */}
+                          &nbsp;&nbsp;&nbsp;{tele}
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faEnvelope} />
-                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.email} */}
+                          &nbsp;&nbsp;&nbsp;{email}
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faLocationDot} />
-                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
-                          {selectedUser.district},&nbsp;{selectedUser.province}{" "}
-                          province,&nbsp;Sri Lanka. */}
+                          &nbsp;&nbsp;&nbsp;{address},&nbsp;
+                          {district} district,&nbsp;{province}{" "}
+                          province,&nbsp;Sri Lanka.
                         </p>
                       </div>
                       <p>&nbsp;</p>
@@ -279,11 +334,30 @@ function UserReports() {
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faRuler} />
-                          &nbsp;&nbsp;&nbsp;100cm
+                          &nbsp;&nbsp;&nbsp;{height} ft
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faWeightScale} />
-                          &nbsp;&nbsp;&nbsp;10Kg
+                          &nbsp;&nbsp;&nbsp;{weight} Kg
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faDroplet} />
+                          &nbsp;&nbsp;&nbsp;{bloodGroup} Blood
+                        </p>
+                      </div>
+                      <p>&nbsp;</p>
+                      <div className="w-full h-1/2 text-sm">
+                        <p className="font-bold text-lg pb-3">
+                          Report Details:
+                        </p>
+                        <p className="h-full w-full">
+                          - Report type:&nbsp;&nbsp;&nbsp;{reportType}
+                        </p>
+                        <p className="h-full w-full">
+                          - Sent date:&nbsp;&nbsp;&nbsp;{reportSentDate}
+                        </p>
+                        <p className="h-full w-full">
+                          - Sent time:&nbsp;&nbsp;&nbsp;{reportSentTime}
                         </p>
                       </div>
                     </div>

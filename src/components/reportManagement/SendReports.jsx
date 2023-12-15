@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { set, ref, onValue } from "firebase/database";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 function Payment() {
   const [userData, setUserData] = useState([]);
   const [repTypeData, setRepTypeData] = useState([]);
   const [reportType, setReportType] = useState("");
   const [userName, setUserName] = useState("");
+  const [uid, setUid] = useState("");
 
   const [showAddedSuccessModal, setShowAddedSuccessModal] = useState(false);
   const [showAddedUnsuccessModal, setShowAddedUnsuccessModal] = useState(false);
@@ -33,7 +32,7 @@ function Payment() {
     onValue(userRef, (snapshot) => {
       const userData = [];
       snapshot.forEach((childSnapshot) => {
-        const user = childSnapshot.val();
+        const user = { uid: childSnapshot.key, ...childSnapshot.val() }; // Include uid in the user object
         userData.push(user);
       });
       setUserData(userData);
@@ -57,8 +56,8 @@ function Payment() {
     let isValid = true;
     // Get the current date and time
     const currentDate = new Date();
-    const currentDateString = currentDate.toISOString().split('T')[0]; // Get date as a string
-    const currentTimeString = currentDate.toTimeString().split(' ')[0]; // Get time as a string
+    const currentDateString = currentDate.toISOString().split("T")[0]; // Get date as a string
+    const currentTimeString = currentDate.toTimeString().split(" ")[0]; // Get time as a string
 
     if (!mVal1) {
       setMVal1Error("Value_1 is required");
@@ -88,16 +87,23 @@ function Payment() {
         const userReportData = {
           reportType,
           userName,
+          uid,
           mVal1,
           mVal2,
           mVal3,
           mVal4,
           note,
           Date: currentDateString,
-          time: currentTimeString
+          time: currentTimeString,
         };
 
-        set(ref(db, `userReports/${userName}_${reportType}_${currentDateString}_${currentTimeString}`), userReportData);
+        set(
+          ref(
+            db,
+            `userReports/${userName}_${reportType}_${currentDateString}_${currentTimeString}`
+          ),
+          userReportData
+        );
         setLoading(false);
         setShowAddedSuccessModal(true);
       } catch (error) {
@@ -160,11 +166,19 @@ function Payment() {
                     value={userName}
                     onChange={(e) => {
                       const selectedValue = e.target.value;
+                      const selectedUser = userData.find(
+                        (user) => user.userName === selectedValue
+                      );
                       setUserName(
                         selectedValue === "Select the User"
                           ? null
                           : selectedValue
                       );
+                      setUid(
+                        selectedValue === "Select the User"
+                          ? null
+                          : selectedUser.uid
+                      ); // Set the uid in state
                     }}
                   >
                     <option className="text-primary-blue dark:text-gray1">
