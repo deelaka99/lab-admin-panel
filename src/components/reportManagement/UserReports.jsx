@@ -22,15 +22,28 @@ import {
   faEnvelope,
   faRuler,
   faWeightScale,
+  faDroplet,
 } from "@fortawesome/free-solid-svg-icons";
 
 function UserReports() {
   const [uid, setUid] = useState(null);
   const [userName, setUserName] = useState("");
+  const [tele, setTele] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
   const [userPropic, setUserPropic] = useState("");
+  const [district, setDistrict] = useState("");
+  const [province, setProvince] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [bday, setbday] = useState("1999-12-14");
+  const [age, setAge] = useState(0);
+  const [bloodGroup, setBloodGroup] = useState("A+");
   const [userData, setUserData] = useState([]);
+  const [reportType, setReportType] = useState("");
+  const [reportSentDate, setReportSentDate] = useState("");
+  const [reportSentTime, setReportSentTime] = useState("");
   const [reportData, setReportData] = useState([]);
-  const [selectedReport, setSelectedReport] = useState([]);
   const [showViewModal, setShowViewModal] = useState(false);
 
   const [showReportRemoveSuccessModal, setShowReportRemoveSuccessModal] =
@@ -66,17 +79,40 @@ function UserReports() {
       userData.forEach((user) => {
         if (user.uid === uid) {
           setUserName(user.userName);
+          setTele(user.telephone);
+          setEmail(user.email);
+          setAddress(user.address);
           setUserPropic(user.proPic);
+          setDistrict(user.district);
+          setProvince(user.province);
+          setHeight(user.height);
+          setWeight(user.weight);
+          setBloodGroup(user.blood);
+          setbday(user.bday);
         }
       });
+      //calculating age
+      const today = new Date();
+      const birthDate = new Date(bday);
+      const ageDifference = today - birthDate; // Calculate the difference in milliseconds
+      const calculatedAge = Math.floor(
+        // Convert the difference to years
+        ageDifference / (365.25 * 24 * 60 * 60 * 1000)
+      );
+
+      setAge(calculatedAge);
+
       setShowViewModal(true);
+      setUid(null);
     }
   }, [uid]);
 
   //Function to handle view button
   const handleViewClick = (report) => {
-    setSelectedReport(report);
     setUid(report.uid);
+    setReportType(report.reportType);
+    setReportSentDate(report.Date);
+    setReportSentTime(report.time);
   };
 
   //Function to hadle remove button
@@ -264,8 +300,11 @@ function UserReports() {
                           alt="proPic"
                         />
                       </div>
-                      <p className="h-1/2 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
                         {userName}
+                      </p>
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter text-sm">
+                        {age} years old
                       </p>
                     </div>
                     <div className="h-full w-1/2 p-2 font-inter">
@@ -275,17 +314,17 @@ function UserReports() {
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faPhoneVolume} />
-                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.telephone} */}
+                          &nbsp;&nbsp;&nbsp;{tele}
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faEnvelope} />
-                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.email} */}
+                          &nbsp;&nbsp;&nbsp;{email}
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faLocationDot} />
-                          {/* &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
-                          {selectedUser.district},&nbsp;{selectedUser.province}{" "}
-                          province,&nbsp;Sri Lanka. */}
+                          &nbsp;&nbsp;&nbsp;{address},&nbsp;
+                          {district} district,&nbsp;{province}{" "}
+                          province,&nbsp;Sri Lanka.
                         </p>
                       </div>
                       <p>&nbsp;</p>
@@ -295,11 +334,30 @@ function UserReports() {
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faRuler} />
-                          &nbsp;&nbsp;&nbsp;100cm
+                          &nbsp;&nbsp;&nbsp;{height} ft
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faWeightScale} />
-                          &nbsp;&nbsp;&nbsp;10Kg
+                          &nbsp;&nbsp;&nbsp;{weight} Kg
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faDroplet} />
+                          &nbsp;&nbsp;&nbsp;{bloodGroup} Blood
+                        </p>
+                      </div>
+                      <p>&nbsp;</p>
+                      <div className="w-full h-1/2 text-sm">
+                        <p className="font-bold text-lg pb-3">
+                          Report Details:
+                        </p>
+                        <p className="h-full w-full">
+                          - Report type:&nbsp;&nbsp;&nbsp;{reportType}
+                        </p>
+                        <p className="h-full w-full">
+                          - Sent date:&nbsp;&nbsp;&nbsp;{reportSentDate}
+                        </p>
+                        <p className="h-full w-full">
+                          - Sent time:&nbsp;&nbsp;&nbsp;{reportSentTime}
                         </p>
                       </div>
                     </div>
