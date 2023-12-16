@@ -17,7 +17,8 @@ import DebouncedInput from "../tables/sampleTable/DebouncedInput";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUserPlus,
+  faDroplet,
+  faCakeCandles,
   faFloppyDisk,
   faPhoneVolume,
   faLocationDot,
@@ -31,6 +32,8 @@ function ManageUsers() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [userData, setUserData] = useState([]); // State to store retrieved data
   const [selectedUser, setSelectedUser] = useState(null);
+  const [age, setAge] = useState(0);
+  const [bday, setBday] = useState("1999-12-14");
 
   const [showUserUpdateSuccessModal, setShowUserUpdateSuccessModal] =
     useState(false);
@@ -57,7 +60,21 @@ function ManageUsers() {
       });
       setUserData(userData);
     });
-  }, []);
+
+    if (selectedUser) {
+      //calculating age
+      setBday(selectedUser.bday);
+      const today = new Date();
+      const birthDate = new Date(bday);
+      const ageDifference = today - birthDate; // Calculate the difference in milliseconds
+      const calculatedAge = Math.floor(
+        // Convert the difference to years
+        ageDifference / (365.25 * 24 * 60 * 60 * 1000)
+      );
+
+      setAge(calculatedAge);
+    }
+  }, [selectedUser]);
 
   // user update function
   const updateUserData = () => {
@@ -93,7 +110,7 @@ function ManageUsers() {
     deleteObject(imageRef)
       .then(() => {
         // Image deleted successfully from Firebase Storage
-        console.log(user.userName,"'s proPic deleted from Firebase Storage");
+        console.log(user.userName, "'s proPic deleted from Firebase Storage");
       })
       .catch((error) => {
         console.error("Error deleting proPic from Firebase Storage:", error);
@@ -459,8 +476,16 @@ function ManageUsers() {
                           alt="proPic"
                         />
                       </div>
-                      <p className="h-1/2 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
                         {selectedUser.userName}
+                      </p>
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter text-sm">
+                        {age} years old
+                      </p>
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter text-sm">
+                        <FontAwesomeIcon icon={faCakeCandles} />
+                        &nbsp;&nbsp;&nbsp;
+                        {selectedUser.bday}
                       </p>
                     </div>
                     <div className="h-full w-1/2 p-2 font-inter">
@@ -479,7 +504,8 @@ function ManageUsers() {
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faLocationDot} />
                           &nbsp;&nbsp;&nbsp;{selectedUser.address},&nbsp;
-                          {selectedUser.district},&nbsp;{selectedUser.province} province,&nbsp;Sri Lanka.
+                          {selectedUser.district} district,&nbsp;
+                          {selectedUser.province} province,&nbsp;Sri Lanka.
                         </p>
                       </div>
                       <p>&nbsp;</p>
@@ -489,11 +515,15 @@ function ManageUsers() {
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faRuler} />
-                          &nbsp;&nbsp;&nbsp;100cm
+                          &nbsp;&nbsp;&nbsp;{selectedUser.height} ft
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faWeightScale} />
-                          &nbsp;&nbsp;&nbsp;10Kg
+                          &nbsp;&nbsp;&nbsp;{selectedUser.weight} Kg
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faDroplet} />
+                          &nbsp;&nbsp;&nbsp;{selectedUser.blood} blood
                         </p>
                       </div>
                     </div>
