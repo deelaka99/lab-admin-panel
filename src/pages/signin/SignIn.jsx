@@ -1,5 +1,8 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
-import React, { useEffect, useState } from "react";
+import {
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import React, { useState } from "react";
 import { auth, db, logout } from "../../firebase";
 import { ref, get } from "firebase/database";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -9,11 +12,17 @@ function SignIn() {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [resetEmail, setResetEmail] = useState(null);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [_user, setUser] = useState("");
   const [loading, setLoading] = useState(false);
   const [userTypeError, setUserTypeError] = useState(false);
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
+  const [showResetMailSentSuccessModal, setShowResetMailSentSuccessModal] =
+    useState(false);
+  const [showResetMailSentUnsuccessModal, setShowResetMailSentUnsuccessModal] =
+    useState(false);
 
   const signIn = (e) => {
     setLoading(true);
@@ -94,6 +103,25 @@ function SignIn() {
           console.log("Sign in errors: ", e);
           setError(true);
           setLoading(false);
+        });
+    }
+  };
+
+  //forgot password function
+  const handleForgotPassword = () => {
+    setShowPasswordResetModal(true);
+  };
+
+  const handleEmailResetSendBtn = () => {
+    if (resetEmail) {
+      sendPasswordResetEmail(auth, resetEmail)
+        .then(() => {
+          setShowResetMailSentSuccessModal(true);
+          setShowPasswordResetModal(false);
+          setResetEmail("");
+        })
+        .catch((error) => {
+          setShowResetMailSentUnsuccessModal(true);
         });
     }
   };
@@ -182,7 +210,10 @@ function SignIn() {
                   </div>
 
                   <div className="w-1/2 h-full flex items-center justify-center">
-                    <p className="text-[9px] md:text-[12px] lg:text-[15px] font-bold text-primary-blue hover:text-blue1 active:text-black">
+                    <p
+                      className="text-[9px] md:text-[12px] lg:text-[15px] font-bold text-primary-blue hover:text-blue1 cursor-pointer"
+                      onClick={handleForgotPassword}
+                    >
                       Forgot Password
                     </p>
                   </div>
@@ -200,7 +231,115 @@ function SignIn() {
           </div>
         </div>
       </div>
-      {/*right container*/}
+
+      {/**Password reset modal */}
+      {showPasswordResetModal ? (
+        <div>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-1 rounded-t">
+                  <h3 className="text-md">Reset the password</h3>
+                  <button
+                    className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
+                    onClick={() => setShowPasswordResetModal(false)}
+                  >
+                    <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-2xl dark:text-white flex items-center justify-center">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="bg-white relative p-2 flex items-center">
+                  <div className="flex items-center">
+                    <input
+                      type="text"
+                      placeholder="Enter your mail here"
+                      className="rounded-tl-md rounded-bl-md p-1 h-3/5 w-full bg-white border-primary-blue border text-primary-blue text-sm font-light font-inter placeholder:text-primary-blue"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                    />
+                    <button onClick={handleEmailResetSendBtn} className="rounded-tr-md rounded-br-md p-1 h-3/5 w-2/5 bg-primary-blue text-white text-sm text-center font-light font-inter">Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </div>
+      ) : null}
+
+      {/**Success reset mail modal */}
+      {showResetMailSentSuccessModal ? (
+        <div>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-white">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="p-5 rounded-lg shadow-lg relative flex flex-col w-full bg-green border-2 outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-2 rounded-t">
+                  <h3 className="text-sm">Notification</h3>
+                  <button
+                    className="ml-auto bg-red rounded-sm border-0 text-lg font-semibold drop-shadow-md active:bg-white"
+                    onClick={() => setShowResetMailSentSuccessModal(false)}
+                  >
+                    <span className=" drop-shadow-lg shadow-black h-6 w-6 text-white flex items-center justify-center active:text-dark-ternary">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="relative p-6 flex flex-col">
+                  <h3 className="text-2xl font-semibold text-center">
+                    Reset mail sent Successfully ! 😎
+                  </h3>
+                  <p className="text-center font-inter font-light text-sm">
+                    -Go through your mailbox and look for the reset mail-
+                  </p>
+                </div>
+                {/*footer*/}
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </div>
+      ) : null}
+
+      {/**Unsuccess reset mail modal */}
+      {showResetMailSentUnsuccessModal ? (
+        <div>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-white">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="p-5 rounded-lg shadow-lg relative flex flex-col w-full bg-red border-2 outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-2 rounded-t">
+                  <h3 className="text-sm">Notification</h3>
+                  <button
+                    className="ml-auto bg-red-1 rounded-sm border-0 text-lg font-semibold drop-shadow-md active:bg-white"
+                    onClick={() => setShowResetMailSentUnsuccessModal(false)}
+                  >
+                    <span className=" drop-shadow-lg shadow-black h-6 w-6 text-white flex items-center justify-center active:text-dark-ternary">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="relative p-6 flex flex-col">
+                  <h3 className="text-center text-2xl font-semibold">
+                    Reset mail sent Unsuccessfully ! 😢
+                  </h3>
+                </div>
+                {/*footer*/}
+              </div>
+            </div>
+          </div>
+          <div className="rounded-lg opacity-50 fixed inset-0 z-40 bg-black"></div>
+        </div>
+      ) : null}
+
       <div className="h-full w-1/2 bg-primary-blue opacity-80"></div>
       {loading ? (
         <>
