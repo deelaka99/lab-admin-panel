@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 
 function AddNewUser() {
+  const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
   const provinces = [
     "Western",
     "Central",
@@ -43,6 +45,10 @@ function AddNewUser() {
   const [address, setAddress] = useState("");
   const [province, setProvince] = useState("Western");
   const [email, setEmail] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [bday, setBday] = useState("1999-01-01");
+  const [blood, setBlood] = useState("A+");
   const [proPic, setProPic] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFilePath, setSelectedFilePath] = useState(null);
@@ -57,6 +63,10 @@ function AddNewUser() {
   const [addressError, setAddressError] = useState("");
   const [provinceError, setProvinceError] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [heightError, setHeightError] = useState("");
+  const [weightError, setWeightError] = useState("");
+  const [bdayError, setBdayError] = useState("");
+  const [bloodError, setBloodError] = useState("");
   const [proPicError, setProPicError] = useState("");
   const [authError, setAuthError] = useState("");
   const [proPicUploadError, setProPicUploadError] = useState("");
@@ -104,6 +114,45 @@ function AddNewUser() {
 
     if (!userName) {
       setUserNameError("User name is required");
+      isValid = false;
+    }
+
+    if (!height) {
+      setHeightError("Height is required");
+      isValid = false;
+    } else if (!/^\d+$/.test(height)) {
+      setHeightError("Height should be a numeric value");
+      isValid = false;
+    } else if (parseInt(height) <= 0) {
+      setHeightError("Height should be greater than 0");
+      isValid = false;
+    }
+
+    if (!weight) {
+      setWeightError("Weight is required");
+      isValid = false;
+    } else if (!/^\d+$/.test(weight)) {
+      setWeightError("Weight should be a numeric value");
+      isValid = false;
+    } else if (parseInt(weight) <= 0) {
+      setWeightError("Weight should be greater than 0");
+      isValid = false;
+    }
+
+    if (!bday) {
+      setBdayError("Birth date is required");
+      isValid = false;
+    } else {
+      // Assuming bday is in the format YYYY-MM-DD
+      const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(bday);
+      if (!isValidDate) {
+        setBdayError("Invalid date format. Please use YYYY-MM-DD");
+        isValid = false;
+      }
+    }
+
+    if (!blood) {
+      setBloodError("Blood Group is required");
       isValid = false;
     }
 
@@ -218,6 +267,10 @@ function AddNewUser() {
                       address,
                       province,
                       email,
+                      height,
+                      weight,
+                      bday,
+                      blood,
                       proPic: downloadURL,
                       type: "user",
                       blocked: true,
@@ -274,7 +327,7 @@ function AddNewUser() {
           <div className="h-3/5 w-full p-2 flex text-white">
             {/**first column */}
             <div className="w-1/2 h-full p-3">
-              <div className="h-1/4 w-full flex">
+              <div className="h-1/6 w-full flex">
                 <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
                   Operator
                 </div>
@@ -286,7 +339,7 @@ function AddNewUser() {
                       operatorNameError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={operatorName}
                     onChange={(e) => {
                       setOperatorName(e.target.value);
@@ -295,7 +348,7 @@ function AddNewUser() {
                   />
                 </div>
               </div>
-              <div className="h-1/4 w-full flex">
+              <div className="h-1/6 w-full flex">
                 <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
                   User name
                 </div>
@@ -307,7 +360,7 @@ function AddNewUser() {
                       userNameError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={userName}
                     onChange={(e) => {
                       setUserName(e.target.value);
@@ -316,7 +369,7 @@ function AddNewUser() {
                   />
                 </div>
               </div>
-              <div className="h-1/4 w-full flex">
+              <div className="h-1/6 w-full flex">
                 <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
                   District
                 </div>
@@ -326,7 +379,7 @@ function AddNewUser() {
                       districtError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={district}
                     onChange={(e) => {
                       setDistrict(e.target.value);
@@ -334,14 +387,18 @@ function AddNewUser() {
                     }}
                   >
                     {provinceToDistricts[province].map((district) => (
-                      <option className="text-primary-blue dark:text-gray1" key={district} value={district}>
+                      <option
+                        className="text-primary-blue dark:text-gray1"
+                        key={district}
+                        value={district}
+                      >
                         {district}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
-              <div className="h-1/4 w-full flex">
+              <div className="h-1/6 w-full flex">
                 <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
                   Telephone
                 </div>
@@ -353,7 +410,7 @@ function AddNewUser() {
                       telephoneError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={telephone}
                     onChange={(e) => {
                       setTelephone(e.target.value);
@@ -362,10 +419,60 @@ function AddNewUser() {
                   />
                 </div>
               </div>
+              <div className="h-1/6 w-full flex">
+                <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
+                  Height
+                </div>
+                <div className="h-full w-4/6 p-2">
+                  <input
+                    type="text"
+                    placeholder="Enter height in ft"
+                    className={`${
+                      heightError === ""
+                        ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
+                        : "border-white bg-red-2 text-white"
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    value={height}
+                    onChange={(e) => {
+                      setHeight(e.target.value);
+                      setHeightError("");
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="h-1/6 w-full flex">
+                <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
+                  Blood Group
+                </div>
+                <div className="h-full w-4/6 p-2">
+                  <select
+                    className={`${
+                      bloodError === ""
+                        ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
+                        : "border-white bg-red-2 text-white"
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    value={blood}
+                    onChange={(e) => {
+                      setBlood(e.target.value);
+                      setBloodError("");
+                    }}
+                  >
+                    {bloodGroups.map((p) => (
+                      <option
+                        className="text-primary-blue dark:text-gray1"
+                        key={p}
+                        value={p}
+                      >
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
             {/**Second column */}
             <div className="w-1/2 h-full p-3">
-              <div className="h-1/4 w-full flex">
+              <div className="h-1/6 w-full flex">
                 <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
                   Password
                 </div>
@@ -377,7 +484,7 @@ function AddNewUser() {
                       passwordError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
@@ -386,7 +493,7 @@ function AddNewUser() {
                   />
                 </div>
               </div>
-              <div className="h-1/4 w-full flex">
+              <div className="h-1/6 w-full flex">
                 <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
                   Address
                 </div>
@@ -398,7 +505,7 @@ function AddNewUser() {
                       addressError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={address}
                     onChange={(e) => {
                       setAddress(e.target.value);
@@ -407,7 +514,7 @@ function AddNewUser() {
                   />
                 </div>
               </div>
-              <div className="h-1/4 w-full flex">
+              <div className="h-1/6 w-full flex">
                 <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
                   Province
                 </div>
@@ -417,7 +524,7 @@ function AddNewUser() {
                       provinceError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold`}
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 pl-3 font-semibold`}
                     value={province}
                     onChange={(e) => {
                       setProvince(e.target.value);
@@ -437,7 +544,7 @@ function AddNewUser() {
                   </select>
                 </div>
               </div>
-              <div className="h-1/4 w-full flex">
+              <div className="h-1/6 w-full flex">
                 <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
                   Email
                 </div>
@@ -449,11 +556,53 @@ function AddNewUser() {
                       emailError === ""
                         ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
                         : "border-white bg-red-2 text-white"
-                    } w-full h-full rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
                       setEmailError("");
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="h-1/6 w-full flex">
+                <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
+                  Weight
+                </div>
+                <div className="h-full w-4/6 p-2">
+                  <input
+                    type="text"
+                    placeholder="Enter weight in Kilo grams"
+                    className={`${
+                      weightError === ""
+                        ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
+                        : "border-white bg-red-2 text-white"
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    value={weight}
+                    onChange={(e) => {
+                      setWeight(e.target.value);
+                      setWeightError("");
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="h-1/6 w-full flex">
+                <div className="h-full w-2/6 flex items-center text-ternary-blue dark:text-gray1">
+                  Birth date
+                </div>
+                <div className="h-full w-4/6 p-2">
+                  <input
+                    type="text"
+                    placeholder="YYYY-MM-DD"
+                    className={`${
+                      bdayError === ""
+                        ? "bg-ternary-blue bg-opacity-30 border-white dark:border-gray2 dark:bg-dark-ternary"
+                        : "border-white bg-red-2 text-white"
+                    } w-full h-full text-sm rounded-full text-white dark:text-gray1 border-secondary-blue border-2 p-3 font-semibold placeholder:text-white placeholder:font-light dark:placeholder:text-gray1`}
+                    value={bday}
+                    onChange={(e) => {
+                      setBday(e.target.value);
+                      setBdayError("");
                     }}
                   />
                 </div>
@@ -618,6 +767,26 @@ function AddNewUser() {
                   {proPicUploadError && (
                     <p className="h-1/6 pt-1 text-xs text-center text-white">
                       - {proPicUploadError} -
+                    </p>
+                  )}
+                  {heightError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {heightError} -
+                    </p>
+                  )}
+                  {weightError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {weightError} -
+                    </p>
+                  )}
+                  {bdayError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {bdayError} -
+                    </p>
+                  )}
+                  {bloodError && (
+                    <p className="h-1/6 pt-1 text-xs text-center text-white">
+                      - {bloodError} -
                     </p>
                   )}
                 </div>
