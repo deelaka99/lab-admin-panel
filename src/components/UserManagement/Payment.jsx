@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { db, storage } from "../../firebase";
-import { update, remove, ref, onValue } from "firebase/database";
-import { ref as storageRef, deleteObject } from "firebase/storage";
+import React, { useEffect, useState, useRef } from "react";
+import emailjs from "@emailjs/browser";
+import { db, auth } from "../../firebase";
+import { ref, onValue } from "firebase/database";
 import NotificationModal from "../Modal/NotificationModal";
 import {
   createColumnHelper,
@@ -14,33 +14,37 @@ import {
 import UserPaymentTable from "../tables/UserPaymentTable";
 import DownloadBtn from "../tables/sampleTable/DownloadBtn";
 import DebouncedInput from "../tables/sampleTable/DebouncedInput";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faFloppyDisk,
+  faPaperPlane,
   faPhoneVolume,
   faLocationDot,
   faEnvelope,
   faRuler,
   faWeightScale,
+  faDroplet,
+  faCakeCandles,
 } from "@fortawesome/free-solid-svg-icons";
 
 function Payment() {
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showMailModal, setShowMailModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [userData, setUserData] = useState([]); // State to store retrieved data
   const [selectedUser, setSelectedUser] = useState(null);
+  const auth_user_email = auth.currentUser.email;
+  const [age, setAge] = useState(0);
+  const [bday, setBday] = useState("1999-12-14");
+  const [mailSubject, setMailSubject] = useState("");
 
-  const [showUserUpdateSuccessModal, setShowUserUpdateSuccessModal] =
+  const [showMailSendSuccessModal, setShowMailSendSuccessModal] =
     useState(false);
-  const [showUserUpdateUnsuccessModal, setShowUserUpdateUnsuccessModal] =
+  const [showMailSendUnsuccessModal, setShowMailSendUnsuccessModal] =
     useState(false);
-  const [showUserRemoveSuccessModal, setShowUserRemoveSuccessModal] =
-    useState(false);
-  const [showUserRemoveUnsuccessModal, setShowUserRemoveUnsuccessModal] =
-    useState(false);
-  const [showUserBlockedModal, setShowUserBlockedModal] = useState(false);
-  const [showUserUnblockedModal, setShowUserUnblockedModal] = useState(false);
+
+  //For EmailJS functioning
+  const [user_name, setUser_name] = useState(null);
+  const [user_email, setUser_email] = useState(null);
+  const [message, setMessage] = useState("");
 
   // useEffect hook to fetch data from Firebase
   useEffect(() => {
@@ -53,58 +57,25 @@ function Payment() {
       });
       setUserData(userData);
     });
-  }, []);
 
-  // user update function
-  const updateUserData = () => {
-    const userRef = ref(db, `users/${selectedUser.uid}`);
-    const updates = {
-      userName: selectedUser.userName,
-      telephone: selectedUser.telephone,
-      address: selectedUser.address,
-      district: selectedUser.district,
-    };
+    if (selectedUser) {
+      //calculating age
+      setBday(selectedUser.bday);
+      const today = new Date();
+      const birthDate = new Date(bday);
+      const ageDifference = today - birthDate; // Calculate the difference in milliseconds
+      const calculatedAge = Math.floor(
+        // Convert the difference to years
+        ageDifference / (365.25 * 24 * 60 * 60 * 1000)
+      );
 
-    // Update the data in Firebase realtime
-    update(userRef, updates)
-      .then(() => {
-        // Data updated successfully
-        console.log("User data updated!");
-        setShowEditModal(false); // Close the Edit modal
-        setShowUserUpdateSuccessModal(true);
-      })
-      .catch((error) => {
-        console.error("Error updating User data:", error);
-        setShowUserUpdateUnsuccessModal(true);
-      });
-  };
+      //For EmailJS functioning
+      setUser_name(selectedUser.userName);
+      setUser_email(selectedUser.email);
 
-  //Function to hadle remove button
-  const handleRemoveClick = (user) => {
-    const userRef = ref(db, "users/" + user.uid);
-    const imagePath = user.proPic;
-    const imageRef = storageRef(storage, imagePath);
-
-    // Remove the user's profile picture from Firebase Storage
-    deleteObject(imageRef)
-      .then(() => {
-        // Image deleted successfully from Firebase Storage
-        console.log(user.userName, "'s proPic deleted from Firebase Storage");
-      })
-      .catch((error) => {
-        console.error("Error deleting proPic from Firebase Storage:", error);
-      });
-
-    // Remove the user from Firebase database
-    remove(userRef)
-      .then(() => {
-        setShowUserRemoveSuccessModal(true);
-      })
-      .catch((error) => {
-        console.error("Error removing user:", error);
-        setShowUserRemoveUnsuccessModal(true);
-      });
-  };
+      setAge(calculatedAge);
+    }
+  }, [selectedUser]);
 
   //Function to handle view button
   const handleViewClick = (user) => {
@@ -113,38 +84,9 @@ function Payment() {
   };
 
   // Function to handle edit button
-  const handleEditClick = (user) => {
+  const handleMailSending = (user) => {
     setSelectedUser(user);
-    setShowEditModal(true);
-  };
-
-  // Function to handle block/unblock button
-  const handleToggleBlock = (user) => {
-    //setShowClickAgainModal(true);
-    const userRef = ref(db, `users/${user.uid}`);
-    // Update the blocked status of the user in Firebase
-    const updatedBlockedStatus = !user.blocked;
-    const updates = {
-      blocked: updatedBlockedStatus,
-    };
-
-    // Update the data in Firebase
-    update(userRef, updates)
-      .then(() => {
-        // Data updated successfully
-        console.log(
-          "User statues:",
-          user.userName,
-          updatedBlockedStatus ? "Blocked" : "Unblocked"
-        );
-        //showing blocked modal success or not
-        updatedBlockedStatus
-          ? setShowUserBlockedModal(true)
-          : setShowUserUnblockedModal(true);
-      })
-      .catch((error) => {
-        console.error("Error blocking user:", error);
-      });
+    setShowMailModal(true);
   };
 
   const columnHelper = createColumnHelper();
@@ -177,7 +119,7 @@ function Payment() {
         <div className="flex items-center">
           <button
             className="bg-white text-blue border active:bg-black font-semibold uppercase text-sm px-3 py-1 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-            onClick={() => handleEditClick(info.row.original)}
+            onClick={() => handleMailSending(info.row.original)}
           >
             Send a mail
           </button>
@@ -204,6 +146,32 @@ function Payment() {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  //email.js functions
+  const form = useRef();
+
+  const sendEmail = (e) => {
+    e.preventDefault();
+
+    emailjs
+      .sendForm(
+        "service_ktl1q9y",
+        "template_g1e0olw",
+        form.current,
+        "cqxzL_7BgBKKZE56c"
+      )
+      .then(
+        (result) => {
+          console.log(result.text);
+          setShowMailModal(false);
+          setShowMailSendSuccessModal(true);
+        },
+        (error) => {
+          console.log(error.text);
+          setShowMailSendUnsuccessModal(true);
+        }
+      );
+  };
 
   return (
     <>
@@ -281,8 +249,8 @@ function Payment() {
           </div>
         </div>
       </div>
-      {/**Edit modal */}
-      {showEditModal ? (
+      {/**mail modal */}
+      {showMailModal ? (
         <div>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none text-primary-blue dark:text-white">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
@@ -290,108 +258,93 @@ function Payment() {
               <div className="p-2 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-ternary-blue dark:bg-dark-secondary dark:border-2 dark:border-dark-ternary outline-none focus:outline-none">
                 {/*header*/}
                 <div className="flex items-start justify-between p-1 rounded-t">
-                  <h3 className="text-xl font-semibold">Edit Lab</h3>
+                  <h3 className="text-xl font-semibold">Send mail</h3>
                   <button
                     className=" ml-auto  border-0 text-primary-blue font-semibold active:text-black"
-                    onClick={() => setShowEditModal(false)}
+                    onClick={() => setShowMailModal(false)}
                   >
                     <span className=" text-primary-blue drop-shadow-lg shadow-black h-6 w-6 text-3xl block dark:text-white flex items-center justify-center">
                       ×
                     </span>
                   </button>
                 </div>
-                {/*body*/}
-                <div className="relative p-2 flex flex-col">
-                  <form>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div className="">
-                        <p className="font-semibold">User Name :</p>
+                <form ref={form} onSubmit={sendEmail}>
+                  {/*body*/}
+                  <div className="bg-white relative p-2 flex flex-col dark:bg-dark-ternary">
+                    <div className="h-1/5 w-full flex pt-1 justify-end">
+                      <div>
+                        <p className="font-inter dark:text-gray1">
+                          Admin :&nbsp;
+                          <span className="font-semibold text-sm dark:text-white">
+                            <input
+                              className="border rounded-sm p-1 dark:bg-dark-ternary"
+                              type="text"
+                              name="from_name"
+                              value={auth_user_email}
+                            />
+                          </span>
+                        </p>
                       </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new Lab name"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.userName}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              userName: e.target.value,
-                            })
-                          }
-                        />
+                    </div>
+                    <div className="h-1/5 w-full flex pt-1 justify-end">
+                      <div>
+                        <p className="font-inter dark:text-gray1">
+                          User name:&nbsp;
+                          <span className="font-semibold text-sm dark:text-white">
+                            <input
+                              className="border rounded-sm p-1 dark:bg-dark-ternary"
+                              type="text"
+                              name="user_name"
+                              value={user_name}
+                            />
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="h-1/5 w-full flex pt-1 justify-end">
+                      <div>
+                        <p className="font-inter dark:text-gray1">
+                          Email :&nbsp;
+                          <span className="font-semibold text-sm dark:text-white">
+                            <input
+                              className="border rounded-sm p-1 dark:bg-dark-ternary"
+                              type="text"
+                              name="user_email"
+                              value={user_email}
+                            />
+                          </span>
+                        </p>
                       </div>
                     </div>
                     <div className="h-1/5 w-full flex flex-col">
                       <div>
-                        <p className="font-semibold">Address :</p>
+                        <p>&nbsp;</p>
+                        <p className="font-inter dark:text-gray1">Message :</p>
                       </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new Address"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.address}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              address: e.target.value,
-                            })
-                          }
-                        />
+                      <div className="pb-1">
+                        <div className="w-full h-full pt-1">
+                          <textarea
+                            value={message}
+                            name="message"
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="Enter message here..."
+                            className="h-full w-full rounded p-2 bg-white border-primary-blue dark:border-gray2 dark:bg-dark-ternary text-primary-blue dark:text-gray2 border-2 pl-5 font-light placeholder:text-primary-blue dark:placeholder:text-gray2"
+                          ></textarea>
+                        </div>
                       </div>
                     </div>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div>
-                        <p className="font-semibold">District :</p>
-                      </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new E-mail"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.district}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              district: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="h-1/5 w-full flex flex-col">
-                      <div>
-                        <p className="font-semibold">Telephone :</p>
-                      </div>
-                      <div className="pt-2 pb-2">
-                        <input
-                          type="text"
-                          placeholder="Enter new Telephone"
-                          className="rounded-full p-2 h-3/5 w-full bg-white border-primary-blue border-2 text-center font-semibold dark:border-dark-ternary dark:bg-dark-ternary active:bg-secondary-blue dark:active:bg-dark-secondary"
-                          value={selectedUser.telephone}
-                          onChange={(e) =>
-                            setSelectedUser({
-                              ...selectedUser,
-                              telephone: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    </div>
-                  </form>
-                </div>
-                {/*footer*/}
-                <div className="flex items-center justify-center p-1 rounded-b">
-                  <button
-                    className="bg-primary-blue text-white active:bg-black font-bold uppercase text-md px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:bg-dark-primary"
-                    type="button"
-                    onClick={updateUserData}
-                  >
-                    <FontAwesomeIcon icon={faFloppyDisk} />
-                    &nbsp; Save
-                  </button>
-                </div>
+                  </div>
+                  {/*footer*/}
+                  <div className="flex items-center justify-center p-1 rounded-b">
+                    <button
+                      className="bg-primary-blue text-white active:bg-black font-bold uppercase text-md px-3 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 dark:bg-dark-primary"
+                      type="submit"
+                    >
+                      <FontAwesomeIcon icon={faPaperPlane} />
+                      &nbsp; Send
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -419,7 +372,7 @@ function Payment() {
                   </button>
                 </div>
                 {/*body*/}
-                <div className="w-full h-full p-3">
+                <div className="w-full h-full bg-white dark:bg-dark-ternary p-3">
                   <div className="flex p-1">
                     <div className="h-full w-1/2 p-2">
                       <div className="flex items-center justify-center ">
@@ -431,6 +384,14 @@ function Payment() {
                       </div>
                       <p className="h-1/2 w-full font-md p-2  text-center font-inter font-semibold text-2xl">
                         {selectedUser.userName}
+                      </p>
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter text-sm">
+                        {age} years old
+                      </p>
+                      <p className="h-1/4 w-full font-md p-2  text-center font-inter text-sm">
+                        <FontAwesomeIcon icon={faCakeCandles} />
+                        &nbsp;&nbsp;&nbsp;
+                        {selectedUser.bday}
                       </p>
                     </div>
                     <div className="h-full w-1/2 p-2 font-inter">
@@ -460,11 +421,15 @@ function Payment() {
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faRuler} />
-                          &nbsp;&nbsp;&nbsp;100cm
+                          &nbsp;&nbsp;&nbsp;{selectedUser.height} ft
                         </p>
                         <p className="h-full w-full">
                           <FontAwesomeIcon icon={faWeightScale} />
-                          &nbsp;&nbsp;&nbsp;10Kg
+                          &nbsp;&nbsp;&nbsp;{selectedUser.weight} Kg
+                        </p>
+                        <p className="h-full w-full">
+                          <FontAwesomeIcon icon={faDroplet} />
+                          &nbsp;&nbsp;&nbsp;{selectedUser.blood} blood group
                         </p>
                       </div>
                     </div>
@@ -477,81 +442,29 @@ function Payment() {
         </div>
       ) : null}
 
-      {/**User update success modal */}
-      {showUserUpdateSuccessModal ? (
+      {/**Mail send success modal */}
+      {showMailSendSuccessModal ? (
         <NotificationModal
-          show={showUserUpdateSuccessModal}
+          show={showMailSendSuccessModal}
           onClose={() => {
-            setShowUserUpdateSuccessModal(false);
+            setShowMailSendSuccessModal(false);
           }}
           title="Notification"
-          body="User Updated Successfull! 😎"
+          body="Mail send Successfull! 😎"
           color="green"
         />
       ) : null}
 
-      {/**User update Unsuccess modal */}
-      {showUserUpdateSuccessModal ? (
+      {/**Mail send Unsuccess modal */}
+      {showMailSendUnsuccessModal ? (
         <NotificationModal
-          show={showUserUpdateUnsuccessModal}
+          show={showMailSendUnsuccessModal}
           onClose={() => {
-            setShowUserUpdateUnsuccessModal(false);
+            setShowMailSendUnsuccessModal(false);
           }}
           title="Notification"
-          body="User Updated Unsuccessfull! 😥"
+          body="Mail send Unsuccessfull! 😥"
           color="red"
-        />
-      ) : null}
-
-      {/**User remove success modal */}
-      {showUserRemoveSuccessModal ? (
-        <NotificationModal
-          show={showUserRemoveSuccessModal}
-          onClose={() => {
-            setShowUserRemoveSuccessModal(false);
-          }}
-          title="Notification"
-          body="User Removed! 🤔"
-          color="red"
-        />
-      ) : null}
-
-      {/**User remove unsuccess modal */}
-      {showUserRemoveUnsuccessModal ? (
-        <NotificationModal
-          show={showUserRemoveUnsuccessModal}
-          onClose={() => {
-            setShowUserRemoveUnsuccessModal(false);
-          }}
-          title="Notification"
-          body="User Removal Unsuccessfull! 🤗"
-          color="red"
-        />
-      ) : null}
-
-      {/**User blocked success modal */}
-      {showUserBlockedModal ? (
-        <NotificationModal
-          show={showUserBlockedModal}
-          onClose={() => {
-            setShowUserBlockedModal(false);
-          }}
-          title="Notification"
-          body="User Blocked! 🤔"
-          color="yellow"
-        />
-      ) : null}
-
-      {/**User unblocked success modal */}
-      {showUserUnblockedModal ? (
-        <NotificationModal
-          show={showUserUnblockedModal}
-          onClose={() => {
-            setShowUserUnblockedModal(false);
-          }}
-          title="Notification"
-          body="User UnBlocked! 🤗"
-          color="green"
         />
       ) : null}
     </>
